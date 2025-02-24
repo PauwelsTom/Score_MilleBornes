@@ -3,7 +3,6 @@ import './App.css';
 import { Component } from 'react';
 import { PlayerList } from './Component/PlayerList';
 import { AddPlayer } from './Component/Boutons/AddPlayer';
-import { iconeChevron } from './Data';
 import { RetourMainPage } from './Component/Boutons/RetourMainPage';
 import { PlayerManager } from './Component/PlayerManager';
 import { ResetScores } from './Component/Boutons/ResetScores';
@@ -29,7 +28,7 @@ export default class App extends Component {
   // Ajoute un joueur a la liste
   add_player = () => {
     const name = window.prompt("Nom du nouveau joueur:");
-    if (name != null && name != "") {
+    if (name != null && name !== "") {
       const updatedPlayers = { ...this.state.players, [name]: 0 };
       this.updatePlayer(updatedPlayers);
     }

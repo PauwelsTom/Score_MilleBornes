@@ -65,6 +65,7 @@ export class PlayerManager extends Component {
 
             case "capot":
                 this.capot = checked;
+                break;
 
             default:
                 break;
@@ -74,7 +75,7 @@ export class PlayerManager extends Component {
     }
 
     handleNumberChange = (event) => {
-        const { _, value } = event.target;
+        const value = event.target.value;
         if (value > 1000) {
             event.target.value = 1000;
             return this.handleNumberChange(event);
