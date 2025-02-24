@@ -5,7 +5,7 @@
     align-items: center;
     text-align: center;
 
-    background-color: rgb(160, 0, 0);
+    background-color: rgb(200, 0, 0);
 
     height: 10vh;
     width: 90vw;
@@ -24,5 +24,5 @@
 }
 
 .ResetScoresDiv:hover {
-    background-color: rgb(120, 0, 0);
+    background-color: rgb(160, 0, 0);
 }
