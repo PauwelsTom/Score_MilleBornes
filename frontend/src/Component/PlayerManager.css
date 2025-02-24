@@ -1,0 +1,100 @@
+.PlayerManagerDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+
+    width: 100vw;
+}
+
+.PlayerNameManager {
+    font-size: 5vh;
+    font-weight: bolder;
+}
+
+.PlayerScoreManager {
+    font-size: 5vh;
+    font-weight: bold;
+}
+
+.ManagerCategory {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    width: 90vw;
+    font-size: 2vh;
+
+    margin-top: 5vh;
+}
+
+.CategoryName {
+    width: 30vw;
+}
+
+.CategoryInput {
+    font-size: 3vh;
+}
+
+.CategoryCheckbox {
+    transform: scale(2); /* Augmenter la taille de 1.5 fois */
+    -webkit-transform: scale(2); /* Support pour les anciens navigateurs Webkit */
+    -moz-transform: scale(2); /* Support pour les anciens navigateurs Mozilla */
+    -ms-transform: scale(2); /* Support pour les anciens navigateurs Microsoft */
+    -o-transform: scale(2); /* Support pour les anciens navigateurs Opera */
+    margin-right: 4vw;
+}
+  
+.BoutonNumero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 5vh;
+    width: 5vh;
+
+    border: 1px solid black;
+    border-radius: 1.5vh;
+
+    margin-right: 2vw;
+
+    background-color: rgb(180, 180, 180);
+    transition: background-color 0.3s ease;
+
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+.BoutonNumero:hover {
+    background-color: rgb(120, 120, 120);
+}
+
+.BoutonNumero.active {
+    background-color: rgb(186, 88, 88);
+}
+
+.BoutonValiderManager {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 90vw;
+    height: 10vh;
+
+    margin-top: 4vh;
+
+    background-color: rgb(0, 80, 0);
+
+    border: 1px solid black;
+    border-radius: 1.5vh;
+
+    transition: background-color 0.3s ease;
+
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+
+    font-size: 5vh;
+    font-weight: 600;
+}
+
+.BoutonValiderManager:hover {
+    background-color: rgb(0, 60, 0);
+}

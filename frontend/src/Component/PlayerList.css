@@ -1,0 +1,13 @@
+.PlayerListDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.ListeJoueurTitre {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+
+    font-size: 3vh;
+}

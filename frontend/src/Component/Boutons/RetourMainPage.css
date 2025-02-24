@@ -1,0 +1,32 @@
+.RetourMainPageDiv {
+    position: relative;
+    top: 1vh;
+    left: 1vh;
+    
+    margin-right: auto;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgb(180, 180, 180);
+
+    height: 10vh;
+    width: 10vh;
+
+    border: 1px solid black;
+    border-radius: 1.5vh;
+
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+
+    transition: background-color 0.3s ease;
+}
+
+.IconeRetour {
+    transform: rotate(180deg);
+}
+
+.RetourMainPageDiv:hover {
+    background-color: rgb(120, 120, 120);
+}

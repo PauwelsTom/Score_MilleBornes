@@ -1,0 +1,28 @@
+.AddPlayerDiv {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    background-color: rgb(0, 80, 0);
+
+    height: 10vh;
+    width: 90vw;
+
+    border: 1px solid black;
+    border-radius: 1.5vh;
+
+    margin-top: 1vh;
+
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+
+    transition: background-color 0.3s ease;
+
+    font-size: 5vh;
+    font-weight: bolder;
+}
+
+.AddPlayerDiv:hover {
+    background-color: rgb(0, 60, 0);
+}

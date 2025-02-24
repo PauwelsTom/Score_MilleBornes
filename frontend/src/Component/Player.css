@@ -1,0 +1,68 @@
+.PlayerDiv{
+    background-color: white;
+
+    height: 10vh;
+    width: 90vw;
+
+
+    border: 1px solid black;
+    border-radius: 1.5vh;
+
+    margin-top: 1vh;
+
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+.PlayerInfos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+
+    height: 10vh;
+    width: 90vw;
+}
+
+.PlayerName {
+    width: 50%;
+    margin-left: 2vw;
+
+    font-weight: bold;
+    font-size: min(6vw, 3vh);
+}
+
+.BoutonModifier {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgb(180, 180, 180);
+    height: 9vh;
+    width: 9vh;
+
+    border-radius: 1.5vh;
+
+    margin-right: 2vw;
+
+    transition: background-color 0.3s ease;
+}
+
+.BoutonModifier:hover {
+    background-color: rgb(120, 120, 120);
+}
+
+.ScorePlayer {
+    font-size: min(6vw, 3vh);
+    font-weight: bolder;
+}
+
+.SupprPlayerDiv {
+    height: 0px;
+    width: 0px;
+}
+
+.IconeCroixPlayer {
+    height: 3vh;
+    margin-top: -1vh;
+    margin-left: -2vw;
+}
