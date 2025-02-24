@@ -3,6 +3,7 @@ import "./RetourMainPage.css"
 import { Component } from "react";
 import { iconeChevron } from "../../Data";
 
+// raz
 export class RetourMainPage extends Component {
     constructor(porps) {
         super();
@@ -11,6 +12,7 @@ export class RetourMainPage extends Component {
     handleClick = () => {
         document.getElementById("MainPage").style.transform = "translateX(0vw)";
         document.getElementById("PlayerPage").style.transform = "translateX(100vw)";
+        this.props.raz();
     }
 
     render() {

@@ -3,16 +3,16 @@ import './App.css';
 import { Component } from 'react';
 import { PlayerList } from './Component/PlayerList';
 import { AddPlayer } from './Component/Boutons/AddPlayer';
-import { RetourMainPage } from './Component/Boutons/RetourMainPage';
 import { PlayerManager } from './Component/PlayerManager';
 import { ResetScores } from './Component/Boutons/ResetScores';
+import { FinManche } from './Component/Boutons/FinManche';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       players: JSON.parse(localStorage.getItem('players')) || {},
-      selectedPlayer: "",
+      selectedPlayer: [],
       inGame: false,
     };
 
@@ -45,7 +45,7 @@ export default class App extends Component {
   select_player = (name) => {
     document.getElementById("MainPage").style.transform = "translateX(-100vw)";
     document.getElementById("PlayerPage").style.transform = "translateX(-100vw)";
-    this.setState({selectedPlayer: name});
+    this.setState({selectedPlayer: Object.keys(this.state.players)});
   }
 
   // Ajoute une valeur a un score
@@ -61,6 +61,9 @@ export default class App extends Component {
 
   // Remet les scores a 0
   resetScores = () => {
+    if (!window.confirm("Voulez-vous remettre a 0 les scores ?"))
+      return;
+
     const updatedPlayers = { ...this.state.players };
     for (const player of Object.keys(updatedPlayers)) {
       updatedPlayers[player] = 0;
@@ -73,13 +76,21 @@ export default class App extends Component {
   // Cache / affiche les elements si on est en partie
   inGameVisibility = () => {
     setTimeout(() => {
-      document.getElementById("AddPlayerDiv").style.visibility = this.state.inGame? "hidden": "visible";
-  
       const elements = Array.from(document.getElementsByClassName('SupprPlayerDiv'));
       elements.forEach((element) => {
         element.style.visibility = this.state.inGame? "hidden": "visible";
       });
     }, 10);
+  }
+
+  // Verifie si une partie est finie
+  gameFinished = () => {
+    const players = this.state.players;
+    for (const p of Object.keys(players)) {
+      if (players[p] >= 5000)
+        return true;
+    }
+    return false;
   }
 
   componentDidMount() {
@@ -97,13 +108,20 @@ export default class App extends Component {
       <div className="App">
         <div id="MainPage">
           <span className='TitrePage'>1000 Bornes</span>
-          <AddPlayer add_player={this.add_player} />
+          {
+            this.gameFinished()?
+              <ResetScores reset={this.resetScores}/>
+              :<FinManche select_player={this.select_player}/>
+          }
           <span className="ListeJoueurTitre">Liste des joueurs</span>
-          <PlayerList players={this.state.players} remove_player={this.remove_player} select_player={this.select_player} inGame={this.state.inGame}/>
-          <ResetScores reset={this.resetScores}/>
+          <PlayerList players={this.state.players} remove_player={this.remove_player} />
+          { 
+            this.state.inGame ?
+              <ResetScores reset={this.resetScores}/>
+              : <AddPlayer add_player={this.add_player} />
+          }
         </div>
         <div id="PlayerPage">
-          <RetourMainPage />
           <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score}/>
         </div>
       </div>

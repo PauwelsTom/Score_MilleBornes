@@ -20,6 +20,7 @@ export class PlayerManager extends Component {
         this.capot = false;
     }
 
+    // Gere quand on clique sur un bouton chiffre
     handleClickBouton = (event) => {
         const { id, value, idTemplate } = event.target.dataset;
 
@@ -37,10 +38,12 @@ export class PlayerManager extends Component {
 
             if (idTemplate === "Botte") {
                 this.botte = parseInt(value);
-
             } else if (idTemplate === "CF") {
                 this.cf = parseInt(value);
             }
+
+            if (this.botte < this.cf) 
+                document.getElementById("CF" + this.botte.toString()).click();
 
             this.updateScore();
 
@@ -94,9 +97,12 @@ export class PlayerManager extends Component {
     }
 
     handleValidate = () => {
-        this.props.add_score(this.props.name, this.state.score);
+        this.props.add_score(this.props.name[0], this.state.score);
         this.raz();
-        document.getElementById("RetourMainPageDiv").click();
+        this.props.name.shift();
+        if (this.props.name.length === 0)
+            this.retourMainPage()
+
     }
 
     raz = () => {
@@ -123,8 +129,14 @@ export class PlayerManager extends Component {
         });
     }
 
+    retourMainPage = () => {
+        document.getElementById("MainPage").style.transform = "translateX(0vw)";
+        document.getElementById("PlayerPage").style.transform = "translateX(100vw)";
+        this.raz();
+    }
+
     render() {
-        const name = this.props.name;
+        const name = this.props.name[0];
         const { activeBotte, activeCF } = this.state;
 
         return (
