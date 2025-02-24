@@ -98,6 +98,7 @@ export default class App extends Component {
         <div id="MainPage">
           <span className='TitrePage'>1000 Bornes</span>
           <AddPlayer add_player={this.add_player} />
+          <span className="ListeJoueurTitre">Liste des joueurs</span>
           <PlayerList players={this.state.players} remove_player={this.remove_player} select_player={this.select_player} inGame={this.state.inGame}/>
           <ResetScores reset={this.resetScores}/>
         </div>

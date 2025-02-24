@@ -16,7 +16,7 @@ export class PlayerList extends Component {
 
         return (
             <div className="PlayerListDiv">
-                <span className="ListeJoueurTitre">Liste des joueurs</span>
+                
                 {Object.keys(players)
                     .sort((a, b) => players[b] - players[a])
                     .map((name) => (

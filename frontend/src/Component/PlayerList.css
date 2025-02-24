@@ -1,8 +1,12 @@
 .PlayerListDiv {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    height: 60vh;
+    padding-left: 4vw;
+    padding-right: 4vw;
+    overflow-y: scroll;
 }
 
 .ListeJoueurTitre {
