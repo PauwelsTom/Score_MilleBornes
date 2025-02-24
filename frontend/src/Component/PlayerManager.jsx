@@ -89,7 +89,7 @@ export class PlayerManager extends Component {
             score: this.kilometres + 100 * this.botte + 300 * this.cf +
                    400 * (this.manche ? 1 : 0) + 300 * (this.pas200 ? 1 : 0) 
                    + 500 * (this.capot ? 1 : 0) + 300 * this.couronnement
-                   + (this.botte == 4? 1 : 0) * 700
+                   + (this.botte === 4? 1 : 0) * 700
         });
     }
 
