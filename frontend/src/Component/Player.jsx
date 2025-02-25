@@ -15,7 +15,7 @@ export class Player extends Component {
         const image = iconeRank[this.props.rank] == null? iconeRank["other"]: iconeRank[this.props.rank];
 
 
-        const playerClass = score > 5000 ? "PlayerDiv PlayerWin" : "PlayerDiv";
+        const playerClass = score >= 5000 ? "PlayerDiv PlayerWin" : "PlayerDiv";
 
         return (
             <div className={playerClass}>
