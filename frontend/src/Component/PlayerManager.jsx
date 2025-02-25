@@ -1,7 +1,7 @@
 import { Component } from "react";
 import "./PlayerManager.css";
 
-// name, add_score
+// name, add_score, remove_seleceted
 export class PlayerManager extends Component {
     constructor(props) {
         super(props);
@@ -18,6 +18,7 @@ export class PlayerManager extends Component {
         this.couronnement = false;
         this.pas200 = false;
         this.capot = false;
+        this.equipier = "Aucun";
     }
 
     // Gere quand on clique sur un bouton chiffre
@@ -96,13 +97,19 @@ export class PlayerManager extends Component {
         });
     }
 
-    handleValidate = () => {
-        this.props.add_score(this.props.name[0], this.state.score);
-        this.raz();
-        this.props.name.shift();
-        if (this.props.name.length === 0)
-            this.retourMainPage()
+    handleEquipierChange = (event) => {
+        this.equipier = event.target.value;
+    }
 
+
+    handleValidate = () => {
+        const players = [this.props.name[0]];
+        if (this.equipier !== "Aucun") { players.push(this.equipier); }
+        this.props.add_score(players, this.state.score);
+        const playerRemaining = this.props.remove_seleceted(players);
+        this.raz();
+        if (playerRemaining === 0)
+            this.retourMainPage();
     }
 
     raz = () => {
@@ -113,7 +120,7 @@ export class PlayerManager extends Component {
         document.getElementById('couronnement').checked = false;
         document.getElementById('pas200').checked = false;
         document.getElementById('capot').checked = false;
-        
+        document.getElementById('equipierSelect').value = "Aucun"; // Corrected line
         this.kilometres = 0;
         this.botte = 0;
         this.cf = 0;
@@ -121,18 +128,26 @@ export class PlayerManager extends Component {
         this.couronnement = false;
         this.pas200 = false;
         this.capot = false;
-
-        this.setState({
-            score: 0,
-            activeBotte: "Botte0",
-            activeCF: "CF0",
-        });
+        this.equipier = "Aucun"; // Reset equipier state
+        this.setState({ score: 0, activeBotte: "Botte0", activeCF: "CF0" });
     }
+    
 
     retourMainPage = () => {
         document.getElementById("MainPage").style.transform = "translateX(0vw)";
         document.getElementById("PlayerPage").style.transform = "translateX(100vw)";
         this.raz();
+    }
+
+    onFocusNumber = (event) => {
+        event.target.value = "";
+    }
+
+    onBlurNumber = (event) => {
+        if (event.target.value % 25 !== 0) {
+            event.target.value = event.target.value - (event.target.value % 25);
+        }
+        this.handleNumberChange(event);
     }
 
     render() {
@@ -150,6 +165,8 @@ export class PlayerManager extends Component {
                         type="number"
                         value={this.state.kilometres}
                         onChange={this.handleNumberChange}
+                        onFocus={this.onFocusNumber}
+                        onBlur={this.onBlurNumber}
                         min="0"
                         max="1000"
                         step="25"
@@ -235,6 +252,16 @@ export class PlayerManager extends Component {
                         id="capot"
                     />
                 </div>
+
+                <div className="ManagerCategory">
+                    <span className="CategoryName">Equipier</span>
+                    <select id="equipierSelect" className="EquipierSelect" onChange={this.handleEquipierChange}>
+                        {this.props.name.map((playerName, index) => (
+                            <option key={index} value={playerName}>{playerName === name? "Aucun": playerName}</option>
+                        ))}
+                    </select>
+                </div>
+
 
                 <div className="BoutonValiderManager" onClick={this.handleValidate}>Valider</div>
             </div>

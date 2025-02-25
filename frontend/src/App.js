@@ -48,10 +48,17 @@ export default class App extends Component {
     this.setState({selectedPlayer: Object.keys(this.state.players)});
   }
 
+  remove_seleceted = (toRemove) => {
+    let res = [...this.state.selectedPlayer];
+    for (const rem of toRemove) {res = res.filter(name => name !== rem);}
+    this.setState({selectedPlayer: res});
+    return res.length;
+  }
+
   // Ajoute une valeur a un score
   add_score = (name, add) => {
     const updatedPlayers = { ...this.state.players };
-    updatedPlayers[name] += add;
+    for (const n of name) {updatedPlayers[n] += add;}
     this.updatePlayer(updatedPlayers);
     if (!this.state.inGame)
       this.setState({ inGame: true });
@@ -122,7 +129,7 @@ export default class App extends Component {
           }
         </div>
         <div id="PlayerPage">
-          <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score}/>
+          <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score} remove_seleceted={this.remove_seleceted}/>
         </div>
       </div>
     );

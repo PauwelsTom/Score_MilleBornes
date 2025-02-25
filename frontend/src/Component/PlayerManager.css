@@ -28,7 +28,7 @@
     width: 90vw;
     font-size: 2vh;
 
-    margin-top: 5vh;
+    margin-top: 4vh;
 }
 
 .CategoryName {
@@ -38,6 +38,13 @@
 .CategoryInput {
     font-size: 3vh;
 }
+
+.EquipierSelect {
+    width: 100%;
+    padding: 5px;
+    font-size: 1em;
+  }
+  
 
 .CategoryCheckbox {
     transform: scale(2); /* Augmenter la taille de 1.5 fois */
