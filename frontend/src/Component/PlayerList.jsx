@@ -38,7 +38,7 @@ export class PlayerList extends Component {
                 {Object.keys(players)
                     .sort((a, b) => players[b] - players[a])
                     .map((name, rank) => (
-                        <Player name={name} score={players[name]} remove_player={remove_player} rank={this.get_rank(rank)}/>
+                        <Player key={rank} name={name} score={players[name]} remove_player={remove_player} rank={this.get_rank(rank)}/>
                     )
                 )}
             </div>
