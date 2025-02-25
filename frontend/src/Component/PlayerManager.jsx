@@ -1,5 +1,6 @@
 import { Component } from "react";
 import "./PlayerManager.css";
+import { clickAnimation } from "../fonctions";
 
 // name, add_score, remove_seleceted
 export class PlayerManager extends Component {
@@ -110,6 +111,7 @@ export class PlayerManager extends Component {
         this.raz();
         if (playerRemaining === 0)
             this.retourMainPage();
+        clickAnimation("BoutonValiderManager");
     }
 
     raz = () => {
@@ -263,7 +265,7 @@ export class PlayerManager extends Component {
                 </div>
 
 
-                <div className="BoutonValiderManager" onClick={this.handleValidate}>Valider</div>
+                <div className="BoutonValiderManager" id="BoutonValiderManager" onClick={this.handleValidate}>Valider</div>
             </div>
         );
     }

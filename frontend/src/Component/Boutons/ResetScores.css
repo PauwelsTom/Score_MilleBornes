@@ -1,3 +1,5 @@
+@import url("../../Colors.css");
+
 .ResetScoresDiv {
     display: flex;
 
@@ -5,13 +7,14 @@
     align-items: center;
     text-align: center;
 
-    background-color: rgb(200, 0, 0);
+    background-color: var(--background-color);
+    color: var(--rouge);
 
     height: 10vh;
     width: 90vw;
 
-    border: 1px solid black;
-    border-radius: 1.5vh;
+    border: 5px solid var(--rouge);
+    border-radius: 5vh;
 
     margin-top: 1vh;
 
@@ -24,5 +27,6 @@
 }
 
 .ResetScoresDiv:hover {
-    background-color: rgb(160, 0, 0);
+    color: var(--background-color);
+    background-color: var(--rouge);
 }

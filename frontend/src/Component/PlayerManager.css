@@ -1,3 +1,5 @@
+@import url("../Colors.css");
+
 .PlayerManagerDiv {
     display: flex;
     justify-content: center;
@@ -78,7 +80,7 @@
 }
 
 .BoutonNumero.active {
-    background-color: rgb(186, 88, 88);
+    background-color: var(--rouge);
 }
 
 .BoutonValiderManager {
@@ -91,10 +93,11 @@
 
     margin-top: 5vh;
 
-    background-color: rgb(0, 160, 0);
+    background-color: var(--background-color);
+    color: var(--vert);
 
-    border: 1px solid black;
-    border-radius: 1.5vh;
+    border: 5px solid var(--vert);
+    border-radius: 5vh;
 
     transition: background-color 0.3s ease;
 
@@ -105,5 +108,12 @@
 }
 
 .BoutonValiderManager:hover {
-    background-color: rgb(0, 120, 0);
+    background-color: var(--vert);
+    color: var(--background-color);
+}
+
+/* .BoutonValiderManager:active, */
+.BoutonValiderManager.clicked {
+    background-color: var(--background-color);
+    color: var(--vert);
 }

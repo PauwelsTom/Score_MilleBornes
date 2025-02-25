@@ -1,3 +1,5 @@
+@import url("../Colors.css");
+
 .PlayerDiv{
     background-color: white;
 
@@ -68,5 +70,5 @@
 }
 
 .PlayerWin{
-    background-color: rgb(0, 160, 0);
+    background-color: var(--vert);
 }
