@@ -73,6 +73,10 @@ export class PlayerManager extends Component {
                 this.capot = checked;
                 break;
 
+            case "allonge":
+                this.allonge = checked;
+                break;
+
             default:
                 break;
         }
