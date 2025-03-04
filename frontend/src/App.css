@@ -1,5 +1,10 @@
 @import url("./Colors.css");
 
+@font-face {
+  font-family: 'Bauhaus';
+  src: url('./Fonts/BauhausBold.ttf') format('truetype');
+}
+
 .App {
   position: fixed;
   height: 100vh;
@@ -34,5 +39,5 @@
 .TitrePage {
   font-size: 7vh;
   font-weight: 1000;
-  font-family: 'Brush Script MT', cursive;
+  font-family: 'BauhausBold', sans-serif;
 }

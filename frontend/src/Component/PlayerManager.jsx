@@ -54,6 +54,7 @@ export class PlayerManager extends Component {
         });
     }
 
+    // Gere le changement dans les checkbox
     handleCheckboxChange = (event) => {
         const { id, checked } = event.target;
         switch(id) {
@@ -84,6 +85,7 @@ export class PlayerManager extends Component {
         this.updateScore();
     }
 
+    // Gere le changement du nombre de kilometres
     handleNumberChange = (event) => {
         const value = event.target.value;
         if (value > 1000) {
@@ -94,6 +96,7 @@ export class PlayerManager extends Component {
         this.updateScore();
     }
 
+    // Calcule et met a jour le score
     updateScore = () => {
         this.setState({
             score: this.kilometres + 100 * this.botte + 300 * this.cf +
@@ -103,11 +106,12 @@ export class PlayerManager extends Component {
         });
     }
 
+    // Gere le changement des equipiers
     handleEquipierChange = (event) => {
         this.equipier = event.target.value;
     }
 
-
+    // Gere quand on clique sur le bouton valider
     handleValidate = () => {
         const players = [this.props.name[0]];
         if (this.equipier !== "Aucun") { players.push(this.equipier); }
@@ -142,17 +146,19 @@ export class PlayerManager extends Component {
         this.setState({ score: 0, activeBotte: "Botte0", activeCF: "CF0" });
     }
     
-
+    // Fonction pour retourner a la page principale
     retourMainPage = () => {
         document.getElementById("MainPage").style.transform = "translateX(0vw)";
         document.getElementById("PlayerPage").style.transform = "translateX(100vw)";
         this.raz();
     }
 
+    // Quand on clique sur les kilometres
     onFocusNumber = (event) => {
         event.target.value = "";
     }
 
+    // Quand on quitte la zone des kilomtres
     onBlurNumber = (event) => {
         if (event.target.value % 25 !== 0) {
             event.target.value = event.target.value - (event.target.value % 25);
