@@ -2,7 +2,8 @@
 
 @font-face {
   font-family: 'Bauhaus';
-  src: url('./Fonts/BauhausBold.ttf') format('truetype');
+  src: local("BauhausRegular"),
+    url('./Fonts/BauhausRegular.ttf') format('truetype');
 }
 
 .App {
@@ -39,5 +40,5 @@
 .TitrePage {
   font-size: 7vh;
   font-weight: 1000;
-  font-family: 'BauhausBold', sans-serif;
+  font-family: 'Bauhaus';
 }
