@@ -26,7 +26,24 @@
     font-weight: bolder;
 }
 
-.AddPlayerDiv:hover {
-    background-color: var(--vert);
-    color: var(--background-color);
+/* Pour les pc */
+@media (min-width: 1024px) {
+    .AddPlayerDiv:hover {
+        background-color: var(--vert);
+        color: var(--background-color);
+    }
+
+    /* .BoutonValiderManager:active, */
+    .AddPlayerDiv.clicked {
+        background-color: var(--background-color);
+        color: var(--vert);
+    }
+}
+
+/* Pour les mobiles */
+@media (max-width: 1023px) {
+    .AddPlayerDiv.clicked {
+        background-color: var(--vert);
+        color: var(--background-color);
+    }
 }

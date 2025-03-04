@@ -107,13 +107,24 @@
     font-weight: 600;
 }
 
-.BoutonValiderManager:hover {
-    background-color: var(--vert);
-    color: var(--background-color);
+/* Pour les pc */
+@media (min-width: 1024px) {
+    .BoutonValiderManager:hover {
+        background-color: var(--vert);
+        color: var(--background-color);
+    }
+
+    /* .BoutonValiderManager:active, */
+    .BoutonValiderManager.clicked {
+        background-color: var(--background-color);
+        color: var(--vert);
+    }
 }
 
-/* .BoutonValiderManager:active, */
-.BoutonValiderManager.clicked {
-    background-color: var(--background-color);
-    color: var(--vert);
+/* Pour les mobiles */
+@media (max-width: 1023px) {
+    .BoutonValiderManager.clicked {
+        background-color: var(--vert);
+        color: var(--background-color);
+    }
 }

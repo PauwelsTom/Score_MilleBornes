@@ -26,7 +26,25 @@
     font-weight: bolder;
 }
 
-.FinMancheDiv:hover {
-    color: var(--background-color);
-    background-color: var(--bleu-fonce);
+
+/* Pour les pc */
+@media (min-width: 1024px) {
+    .FinMancheDiv:hover {
+        background-color: var(--bleu-fonce);
+        color: var(--background-color);
+    }
+
+    /* .BoutonValiderManager:active, */
+    .FinMancheDiv.clicked {
+        background-color: var(--background-color);
+        color: var(--bleu-fonce);
+    }
+}
+
+/* Pour les mobiles */
+@media (max-width: 1023px) {
+    .FinMancheDiv.clicked {
+        background-color: var(--bleu-fonce);
+        color: var(--background-color);
+    }
 }

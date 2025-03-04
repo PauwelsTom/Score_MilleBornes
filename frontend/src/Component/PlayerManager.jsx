@@ -2,7 +2,7 @@ import { Component } from "react";
 import "./PlayerManager.css";
 import { clickAnimation } from "../fonctions";
 
-// name, add_score, remove_seleceted
+// name, add_score, remove_seleceted, number_player
 export class PlayerManager extends Component {
     constructor(props) {
         super(props);
@@ -16,6 +16,7 @@ export class PlayerManager extends Component {
         this.botte = 0;
         this.cf = 0;
         this.manche = false;
+        this.allonge = false;
         this.couronnement = false;
         this.pas200 = false;
         this.capot = false;
@@ -94,7 +95,7 @@ export class PlayerManager extends Component {
             score: this.kilometres + 100 * this.botte + 300 * this.cf +
                    400 * (this.manche ? 1 : 0) + 300 * (this.pas200 ? 1 : 0) 
                    + 500 * (this.capot ? 1 : 0) + 300 * this.couronnement
-                   + (this.botte === 4? 1 : 0) * 700
+                   + (this.botte === 4? 1 : 0) * 700 + (this.allonge? 1 : 0) * 200
         });
     }
 
@@ -114,11 +115,13 @@ export class PlayerManager extends Component {
         clickAnimation("BoutonValiderManager");
     }
 
+    // Remet a zero toutes les valeurs
     raz = () => {
         document.getElementById('kilometres').value = 0;
         document.getElementById('Botte0').click();
         document.getElementById('CF0').click();
         document.getElementById('manche').checked = false;
+        this.props.number_player === 4 ? this.allonge = false : document.getElementById('allonge').checked = false;
         document.getElementById('couronnement').checked = false;
         document.getElementById('pas200').checked = false;
         document.getElementById('capot').checked = false;
@@ -127,6 +130,7 @@ export class PlayerManager extends Component {
         this.botte = 0;
         this.cf = 0;
         this.manche = false;
+        this.allonge = false;
         this.couronnement = false;
         this.pas200 = false;
         this.capot = false;
@@ -165,7 +169,7 @@ export class PlayerManager extends Component {
                     <span className="CategoryName">Kilomètres</span>
                     <input
                         type="number"
-                        value={this.state.kilometres}
+                        value={this.kilometres}
                         onChange={this.handleNumberChange}
                         onFocus={this.onFocusNumber}
                         onBlur={this.onBlurNumber}
@@ -215,18 +219,33 @@ export class PlayerManager extends Component {
                     <span className="CategoryName">Manche</span>
                     <input
                         type="checkbox"
-                        checked={this.state.manche}
+                        checked={this.manche}
                         onChange={this.handleCheckboxChange}
                         className="CategoryCheckbox"
                         id="manche"
                     />
                 </div>
 
+                {
+                    this.props.number_player === 4?
+                    <div></div>
+                    :<div className="ManagerCategory">
+                        <span className="CategoryName">Allonge</span>
+                        <input
+                            type="checkbox"
+                            checked={this.allonge}
+                            onChange={this.handleCheckboxChange}
+                            className="CategoryCheckbox"
+                            id="allonge"
+                        />
+                    </div>
+                }
+
                 <div className="ManagerCategory">
                     <span className="CategoryName">Couronnement</span>
                     <input
                         type="checkbox"
-                        checked={this.state.couronnement}
+                        checked={this.couronnement}
                         onChange={this.handleCheckboxChange}
                         className="CategoryCheckbox"
                         id="couronnement"
@@ -237,7 +256,7 @@ export class PlayerManager extends Component {
                     <span className="CategoryName">Pas de 200</span>
                     <input
                         type="checkbox"
-                        checked={this.state.pas200}
+                        checked={this.pas200}
                         onChange={this.handleCheckboxChange}
                         className="CategoryCheckbox"
                         id="pas200"
@@ -248,7 +267,7 @@ export class PlayerManager extends Component {
                     <span className="CategoryName">Capot</span>
                     <input
                         type="checkbox"
-                        checked={this.state.capot}
+                        checked={this.capot}
                         onChange={this.handleCheckboxChange}
                         className="CategoryCheckbox"
                         id="capot"

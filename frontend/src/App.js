@@ -68,16 +68,18 @@ export default class App extends Component {
 
   // Remet les scores a 0
   resetScores = () => {
-    if (!window.confirm("Voulez-vous remettre a 0 les scores ?"))
-      return;
-
-    const updatedPlayers = { ...this.state.players };
-    for (const player of Object.keys(updatedPlayers)) {
-      updatedPlayers[player] = 0;
-    }
-    this.updatePlayer(updatedPlayers);
-    this.setState({ inGame: false });
-    this.inGameVisibility();
+    setTimeout(() => {
+      if (!window.confirm("Voulez-vous remettre a 0 les scores ?"))
+        return;
+      
+      const updatedPlayers = { ...this.state.players };
+      for (const player of Object.keys(updatedPlayers)) {
+        updatedPlayers[player] = 0;
+      }
+      this.updatePlayer(updatedPlayers);
+      this.setState({ inGame: false });
+      this.inGameVisibility();
+    }, 200);
   }
 
   // Cache / affiche les elements si on est en partie
@@ -129,7 +131,7 @@ export default class App extends Component {
           }
         </div>
         <div id="PlayerPage">
-          <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score} remove_seleceted={this.remove_seleceted}/>
+          <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score} remove_seleceted={this.remove_seleceted} number_player={Object.keys(this.state.players).length}/>
         </div>
       </div>
     );

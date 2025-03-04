@@ -26,7 +26,24 @@
     font-weight: bolder;
 }
 
-.ResetScoresDiv:hover {
-    color: var(--background-color);
-    background-color: var(--rouge);
+/* Pour les pc */
+@media (min-width: 1024px) {
+    .ResetScoresDiv:hover {
+        background-color: var(--rouge);
+        color: var(--background-color);
+    }
+
+    /* .BoutonValiderManager:active, */
+    .ResetScoresDiv.clicked {
+        background-color: var(--background-color);
+        color: var(--rouge);
+    }
+}
+
+/* Pour les mobiles */
+@media (max-width: 1023px) {
+    .ResetScoresDiv.clicked {
+        background-color: var(--rouge);
+        color: var(--background-color);
+    }
 }
