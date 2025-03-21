@@ -1,6 +1,7 @@
 import { Component } from "react";
 import "./PlayerManager.css";
 import { clickAnimation } from "../fonctions";
+import { iconeMille } from "../Data";
 
 // name, add_score, remove_seleceted, number_player
 export class PlayerManager extends Component {
@@ -15,11 +16,9 @@ export class PlayerManager extends Component {
         this.kilometres = 0;
         this.botte = 0;
         this.cf = 0;
-        this.manche = false;
         this.allonge = false;
         this.couronnement = false;
         this.pas200 = false;
-        this.capot = false;
         this.equipier = "Aucun";
     }
 
@@ -54,24 +53,21 @@ export class PlayerManager extends Component {
         });
     }
 
+    handleMilleBornes = () => {
+        this.kilometres = 1000;
+        this.updateScore();
+    }
+
     // Gere le changement dans les checkbox
     handleCheckboxChange = (event) => {
         const { id, checked } = event.target;
         switch(id) {
-            case "manche":
-                this.manche = checked;
-                break;
-
             case "couronnement":
                 this.couronnement = checked;
                 break;
 
             case "pas200":
                 this.pas200 = checked;
-                break;
-
-            case "capot":
-                this.capot = checked;
                 break;
 
             case "allonge":
@@ -100,8 +96,8 @@ export class PlayerManager extends Component {
     updateScore = () => {
         this.setState({
             score: this.kilometres + 100 * this.botte + 300 * this.cf +
-                   400 * (this.manche ? 1 : 0) + 300 * (this.pas200 ? 1 : 0) 
-                   + 500 * (this.capot ? 1 : 0) + 300 * this.couronnement
+                   400 * (this.kilometres === 1000 ? 1 : 0) + 300 * (this.pas200 ? 1 : 0) 
+                   + 300 * this.couronnement
                    + (this.botte === 4? 1 : 0) * 700 + (this.allonge? 1 : 0) * 200
         });
     }
@@ -114,8 +110,9 @@ export class PlayerManager extends Component {
     // Gere quand on clique sur le bouton valider
     handleValidate = () => {
         const players = [this.props.name[0]];
+        console.log(this.props.name);
         if (this.equipier !== "Aucun") { players.push(this.equipier); } // OK
-        this.props.add_score(players, this.state.score);
+        this.props.add_score(players, this.state.score, this.kilometres === 0);
         const playerRemaining = this.props.remove_seleceted(players);
         this.raz();
         if (playerRemaining === 0) {
@@ -130,20 +127,16 @@ export class PlayerManager extends Component {
         document.getElementById('kilometres').value = 0;
         document.getElementById('Botte0').click();
         document.getElementById('CF0').click();
-        document.getElementById('manche').checked = false;
         this.props.number_player === 4 ? this.allonge = false : document.getElementById('allonge').checked = false;
         document.getElementById('couronnement').checked = false;
         document.getElementById('pas200').checked = false;
-        document.getElementById('capot').checked = false;
         
         this.kilometres = 0;
         this.botte = 0;
         this.cf = 0;
-        this.manche = false;
         this.allonge = false;
         this.couronnement = false;
         this.pas200 = false;
-        this.capot = false;
     
         // Si le joueur validé avait un équipier, mettre le prochain joueur avec le premier de la liste
         if (this.equipier === undefined) {
@@ -194,18 +187,21 @@ export class PlayerManager extends Component {
 
                 <div className="ManagerCategory">
                     <span className="CategoryName">Kilomètres</span>
-                    <input
-                        type="number"
-                        value={this.kilometres}
-                        onChange={this.handleNumberChange}
-                        onFocus={this.onFocusNumber}
-                        onBlur={this.onBlurNumber}
-                        min="0"
-                        max="1000"
-                        step="25"
-                        className="CategoryInput"
-                        id="kilometres"
-                    />
+                    <div className="kmDiv">
+                        <input
+                            type="number"
+                            value={this.kilometres}
+                            onChange={this.handleNumberChange}
+                            onFocus={this.onFocusNumber}
+                            onBlur={this.onBlurNumber}
+                            min="0"
+                            max="1000"
+                            step="25"
+                            className="CategoryInput"
+                            id="kilometres"
+                            />
+                        <img src={iconeMille} alt="1000" id="milleBornes" onClick={this.handleMilleBornes}/>
+                    </div>
                 </div>
 
                 <div className="ManagerCategory">
@@ -240,17 +236,6 @@ export class PlayerManager extends Component {
                             {i}
                         </div>
                     ))}
-                </div>
-
-                <div className="ManagerCategory">
-                    <span className="CategoryName">Manche</span>
-                    <input
-                        type="checkbox"
-                        checked={this.manche}
-                        onChange={this.handleCheckboxChange}
-                        className="CategoryCheckbox"
-                        id="manche"
-                    />
                 </div>
 
                 {
@@ -291,17 +276,6 @@ export class PlayerManager extends Component {
                 </div>
 
                 <div className="ManagerCategory">
-                    <span className="CategoryName">Capot</span>
-                    <input
-                        type="checkbox"
-                        checked={this.capot}
-                        onChange={this.handleCheckboxChange}
-                        className="CategoryCheckbox"
-                        id="capot"
-                    />
-                </div>
-
-                <div className="ManagerCategory">
                     <span className="CategoryName">Equipier</span>
                     <select id="equipierSelect" className="EquipierSelect" onChange={this.handleEquipierChange}>
                         {this.props.name.map((playerName, index) => (
@@ -309,7 +283,6 @@ export class PlayerManager extends Component {
                         ))}
                     </select>
                 </div>
-
 
                 <div className="BoutonValiderManager" id="BoutonValiderManager" onClick={this.handleValidate}>Valider</div>
             </div>

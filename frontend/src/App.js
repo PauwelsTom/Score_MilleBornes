@@ -56,9 +56,17 @@ export default class App extends Component {
   }
 
   // Ajoute une valeur a un score
-  add_score = (name, add) => {
+  add_score = (name, add, capot) => {
     const updatedPlayers = { ...this.state.players };
     for (const n of name) {updatedPlayers[n] += add;}
+
+    if (capot) {
+      for (const n of Object.keys(updatedPlayers)) {
+       // Si n n'est pas present dans la liste name, alors on ajoute 500
+        if (!name.includes(n))
+          updatedPlayers[n] += 500;
+      }
+    }
     this.updatePlayer(updatedPlayers);
     if (!this.state.inGame)
       this.setState({ inGame: true });
@@ -141,7 +149,7 @@ export default class App extends Component {
           }
         </div>
         <div id="PlayerPage">
-          <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score} remove_seleceted={this.remove_seleceted} number_player={Object.keys(this.state.players).length}/>
+          <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score} remove_seleceted={this.remove_seleceted} number_player={Object.keys(this.state.players).length} players={this.state.players}/>
         </div>
       </div>
     );

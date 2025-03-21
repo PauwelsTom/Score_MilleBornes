@@ -7,7 +7,7 @@
 
     flex-direction: column;
 
-    margin-top: 2vh;
+    margin-top: 4vh;
 
     width: 100vw;
 }
@@ -30,7 +30,7 @@
     width: 90vw;
     font-size: 2vh;
 
-    margin-top: 3.3vh;
+    margin-top: 5vh;
 }
 
 .CategoryName {
@@ -127,4 +127,16 @@
         background-color: var(--vert);
         color: var(--background-color);
     }
+}
+
+#milleBornes {
+    height: 6vh;
+}
+
+.kmDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 35vw;
 }

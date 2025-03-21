@@ -8,3 +8,5 @@ export const iconeRank = {
     "other": "https://cdn-icons-png.flaticon.com/512/384/384276.png",
     "last": "https://cdn-icons-png.flaticon.com/512/4223/4223095.png",
 }
+
+export const iconeMille = "https://cdn-icons-png.flaticon.com/512/1232/1232540.png"
