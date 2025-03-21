@@ -9,12 +9,12 @@ export class Player extends Component {
     }
 
     render() {
+        
         const name = this.props.name;
         const score = this.props.score;
         const remove_player = this.props.remove_player;
         const image = iconeRank[this.props.rank] == null? iconeRank["other"]: iconeRank[this.props.rank];
-
-
+        
         const playerClass = score >= 5000 ? "PlayerDiv PlayerWin" : "PlayerDiv";
 
         return (
@@ -26,7 +26,7 @@ export class Player extends Component {
                 <div className="PlayerInfos">
                     <span className="PlayerName">{name}</span>
                     <span className="ScorePlayer">{score}</span>
-                    <img src={image} alt="Classement" height="90%"/>
+                    <img src={image} alt="Classement" height="90%" className="IconeClassement"/>
                 </div>
             </div>
         );

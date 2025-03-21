@@ -9,24 +9,43 @@ export class PlayerList extends Component {
         super();
     }
 
-    get_rank = (rank) => {
+    get_rank = (name) => {
         const players = this.props.players;
-        const playerNames = Object.keys(players);
-
-        let cpt = 1;
-        let ret = false;
-        while (rank > 0 && players[playerNames[rank]] === players[playerNames[rank - cpt]]) {
-            ret = true;
-            cpt += 1;
+        const sortedPlayers = Object.entries(players)
+            .sort((a, b) => b[1] - a[1]); // Trier par score décroissant
+    
+        let rank = 1;
+        let prevScore = null;
+        let playerRanks = {};
+    
+        for (let i = 0; i < sortedPlayers.length; i++) {
+            const [playerName, score] = sortedPlayers[i];
+    
+            if (score !== prevScore) {
+                rank = i + 1; // Ajuster le rang réel
+            }
+            prevScore = score;
+    
+            playerRanks[playerName] = rank;
         }
-        if (ret)
-            return (rank + 1) - (cpt - 1);
-
-        if ((rank + 1) === Object.keys(players).length && Object.keys(players).length > 3)
-            return "last";
-        
-        return rank + 1;
-    }
+    
+        // Si 4 joueurs ou plus, vérifier le dernier rang
+        if (sortedPlayers.length >= 4) {
+            const lastRank = playerRanks[sortedPlayers[sortedPlayers.length - 1][0]];
+            const secondLastRank = playerRanks[sortedPlayers[sortedPlayers.length - 2][0]];
+    
+            if (lastRank === secondLastRank) {
+                // Si le dernier joueur est à égalité avec un autre, on garde leur rang
+            } else {
+                // Sinon, on met "last" uniquement pour le dernier joueur
+                playerRanks[sortedPlayers[sortedPlayers.length - 1][0]] = "last";
+            }
+        }
+    
+        return playerRanks[name] || null; // Retourne le rang ou null si joueur non trouvé
+    };
+    
+    
 
     render() {
         const players = this.props.players;
@@ -38,7 +57,7 @@ export class PlayerList extends Component {
                 {Object.keys(players)
                     .sort((a, b) => players[b] - players[a])
                     .map((name, rank) => (
-                        <Player key={rank} name={name} score={players[name]} remove_player={remove_player} rank={this.get_rank(rank)}/>
+                        <Player key={rank} name={name} score={players[name]} remove_player={remove_player} rank={this.get_rank(name)}/>
                     )
                 )}
             </div>

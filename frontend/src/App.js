@@ -89,6 +89,16 @@ export default class App extends Component {
       elements.forEach((element) => {
         element.style.visibility = this.state.inGame? "hidden": "visible";
       });
+
+      const images = Array.from(document.getElementsByClassName('IconeClassement'));
+      images.forEach((image) => {
+        image.style.visibility = this.state.inGame? "visible": "hidden";
+      });
+
+      const scores = Array.from(document.getElementsByClassName('ScorePlayer'));
+      scores.forEach((image) => {
+        image.style.visibility = this.state.inGame? "visible": "hidden";
+      });
     }, 10);
   }
 

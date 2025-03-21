@@ -114,12 +114,14 @@ export class PlayerManager extends Component {
     // Gere quand on clique sur le bouton valider
     handleValidate = () => {
         const players = [this.props.name[0]];
-        if (this.equipier !== "Aucun") { players.push(this.equipier); }
+        if (this.equipier !== "Aucun") { players.push(this.equipier); } // OK
         this.props.add_score(players, this.state.score);
         const playerRemaining = this.props.remove_seleceted(players);
         this.raz();
-        if (playerRemaining === 0)
+        if (playerRemaining === 0) {
             this.retourMainPage();
+            this.equipier = "Aucun";
+        }
         clickAnimation("BoutonValiderManager");
     }
 
@@ -133,7 +135,7 @@ export class PlayerManager extends Component {
         document.getElementById('couronnement').checked = false;
         document.getElementById('pas200').checked = false;
         document.getElementById('capot').checked = false;
-        document.getElementById('equipierSelect').value = "Aucun"; // Corrected line
+        
         this.kilometres = 0;
         this.botte = 0;
         this.cf = 0;
@@ -142,9 +144,24 @@ export class PlayerManager extends Component {
         this.couronnement = false;
         this.pas200 = false;
         this.capot = false;
-        this.equipier = "Aucun"; // Reset equipier state
+    
+        // Si le joueur validé avait un équipier, mettre le prochain joueur avec le premier de la liste
+        if (this.equipier === undefined) {
+            this.equipier = "Aucun"
+        }
+        if (this.equipier !== "Aucun") {
+            setTimeout(() => {
+                this.equipier = this.props.name[1]; // Prend le premier joueur de la liste comme équipier
+                if (this.equipier === undefined) { this.equipier = "Aucun"; }
+                document.getElementById('equipierSelect').value = this.equipier;
+            }, 10);
+        } else {
+            this.equipier = "Aucun";
+        }
+    
         this.setState({ score: 0, activeBotte: "Botte0", activeCF: "CF0" });
     }
+    
     
     // Fonction pour retourner a la page principale
     retourMainPage = () => {
