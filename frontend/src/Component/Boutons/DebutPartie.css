@@ -1,6 +1,6 @@
 @import url("../../Colors.css");
 
-.ResetScoresDiv {
+.DebutPartieDiv {
     display: flex;
 
     justify-content: center;
@@ -8,12 +8,12 @@
     text-align: center;
 
     background-color: var(--background-color);
-    color: var(--rouge);
+    color: var(--vert);
 
     height: 10vh;
     width: 90vw;
 
-    border: 5px solid var(--rouge);
+    border: 5px solid var(--vert);
     border-radius: 5vh;
 
     margin-top: 1vh;
@@ -26,24 +26,25 @@
     font-weight: bolder;
 }
 
+
 /* Pour les pc */
 @media (min-width: 1024px) {
-    .ResetScoresDiv:hover {
-        background-color: var(--rouge);
+    .DebutPartieDiv:hover {
+        background-color: var(--vert);
         color: var(--background-color);
     }
 
     /* .BoutonValiderManager:active, */
-    .ResetScoresDiv.clicked {
+    .DebutPartieDiv.clicked {
         background-color: var(--background-color);
-        color: var(--rouge);
+        color: var(--vert);
     }
 }
 
 /* Pour les mobiles */
 @media (max-width: 1023px) {
-    .ResetScoresDiv.clicked {
-        background-color: var(--rouge);
+    .DebutPartieDiv.clicked {
+        background-color: var(--vert);
         color: var(--background-color);
     }
 }

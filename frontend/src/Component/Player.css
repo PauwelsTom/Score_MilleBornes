@@ -53,6 +53,22 @@
     background-color: rgb(120, 120, 120);
 }
 
+.ScorePlayerDiv {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.GainPlayer {
+    font-size: 2vh;
+    font-weight: bold;
+    color: var(--vert);
+}
+
+.GainFaible {
+    color: var(--rouge);
+}
+
 .ScorePlayer {
     font-size: min(6vw, 3vh);
     font-weight: bolder;
@@ -71,4 +87,9 @@
 
 .PlayerWin{
     background-color: var(--vert);
+}
+
+/* Fond vert : le gain resterait illisible en vert */
+.PlayerWin .GainPlayer {
+    color: inherit;
 }

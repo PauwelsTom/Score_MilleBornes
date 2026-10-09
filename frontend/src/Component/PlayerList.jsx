@@ -3,7 +3,7 @@ import "./PlayerList.css"
 import { Component } from "react";
 import { Player } from "./Player";
 
-// players, remove_player, inGame
+// players, remove_player, inGame, gains
 export class PlayerList extends Component {
     get_rank = (name) => {
         const players = this.props.players;
@@ -53,7 +53,7 @@ export class PlayerList extends Component {
                 {Object.keys(players)
                     .sort((a, b) => players[b] - players[a])
                     .map((name) => (
-                        <Player key={name} name={name} score={players[name]} remove_player={remove_player} inGame={this.props.inGame} rank={this.get_rank(name)}/>
+                        <Player key={name} name={name} score={players[name]} remove_player={remove_player} inGame={this.props.inGame} gain={this.props.gains[name]} rank={this.get_rank(name)}/>
                     )
                 )}
             </div>

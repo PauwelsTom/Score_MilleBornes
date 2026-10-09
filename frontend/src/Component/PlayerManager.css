@@ -7,18 +7,100 @@
 
     flex-direction: column;
 
-    margin-top: 4vh;
+    margin-top: 2vh;
 
     width: 100vw;
 }
 
+.OngletsDiv {
+    position: relative;
+    display: flex;
+
+    width: 90vw;
+    padding: 0 2vw 2.5vh 2vw;
+
+    overflow-x: auto;
+}
+
+.Onglet {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+
+    height: 5vh;
+    padding: 0 3vw;
+
+    border: 1px solid black;
+    border-radius: 1.5vh;
+
+    margin-right: 2vw;
+
+    background-color: rgb(180, 180, 180);
+    transition: background-color 0.3s ease;
+
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+
+    font-size: 2vh;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.Onglet:first-child {
+    margin-left: auto;
+}
+
+.Onglet:last-child {
+    margin-right: auto;
+}
+
+.Onglet:hover {
+    background-color: rgb(120, 120, 120);
+}
+
+.Onglet.active {
+    background-color: var(--rouge);
+}
+
+.PanneauxDiv {
+    width: 100vw;
+    overflow: hidden;
+}
+
+.PanneauxTrack {
+    display: flex;
+    transition: transform 0.3s ease;
+}
+
+.Panneau {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex: 0 0 100vw;
+
+    width: 100vw;
+    padding-bottom: 2.5vh;
+}
+
 .PlayerNameManager {
+    max-width: 90vw;
+
     font-size: 5vh;
     font-weight: bolder;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .PlayerScoreManager {
     font-size: 5vh;
+    font-weight: bold;
+}
+
+.PlayerCapotManager {
+    font-size: 2vh;
+    line-height: 2vh;
     font-weight: bold;
 }
 
@@ -30,7 +112,7 @@
     width: 90vw;
     font-size: 2vh;
 
-    margin-top: 5vh;
+    margin-top: 4vh;
 }
 
 .CategoryName {
@@ -83,28 +165,45 @@
     background-color: var(--rouge);
 }
 
-.BoutonValiderManager {
+.BoutonsManager {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 90vw;
+}
+
+.BoutonValiderManager, .BoutonRetourManager {
     display: flex;
     justify-content: center;
     align-items: center;
 
-    width: 90vw;
     height: 10vh;
 
-    margin-top: 5vh;
-
     background-color: var(--background-color);
-    color: var(--vert);
 
-    border: 5px solid var(--vert);
     border-radius: 5vh;
 
     transition: background-color 0.3s ease;
 
     box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
 
-    font-size: 5vh;
+    font-size: min(5vh, 6vw);
     font-weight: 600;
+}
+
+.BoutonValiderManager {
+    width: 56vw;
+
+    color: var(--vert);
+    border: 5px solid var(--vert);
+}
+
+.BoutonRetourManager {
+    width: 27vw;
+
+    color: var(--bleu-fonce);
+    border: 5px solid var(--bleu-fonce);
 }
 
 /* Pour les pc */
@@ -119,6 +218,11 @@
         background-color: var(--background-color);
         color: var(--vert);
     }
+
+    .BoutonRetourManager:hover {
+        background-color: var(--bleu-fonce);
+        color: var(--background-color);
+    }
 }
 
 /* Pour les mobiles */
@@ -129,7 +233,7 @@
     }
 }
 
-#milleBornes {
+.milleBornes {
     height: 6vh;
 }
 

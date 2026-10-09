@@ -2,12 +2,13 @@ import { Component } from "react";
 import "./Player.css"
 import { iconeCroix, iconeRank } from "../Data";
 
-// name, score, remove_player, rank, inGame
+// name, score, remove_player, rank, inGame, gain
 export class Player extends Component {
     render() {
         const name = this.props.name;
         const score = this.props.score;
         const remove_player = this.props.remove_player;
+        const gain = this.props.gain;
         const image = iconeRank[this.props.rank] == null? iconeRank["other"]: iconeRank[this.props.rank];
         
         // Cache / affiche les elements si on est en partie
@@ -24,7 +25,10 @@ export class Player extends Component {
                 </div>
                 <div className="PlayerInfos">
                     <span className="PlayerName">{name}</span>
-                    <span className="ScorePlayer" style={inGameStyle}>{score}</span>
+                    <div className="ScorePlayerDiv" style={inGameStyle}>
+                        <span className="ScorePlayer">{score}</span>
+                        {gain !== undefined && <span className={gain <= 100 ? "GainPlayer GainFaible" : "GainPlayer"}>{"(+" + gain + ")"}</span>}
+                    </div>
                     <img src={image} alt="Classement" height="90%" className="IconeClassement" style={inGameStyle}/>
                 </div>
             </div>

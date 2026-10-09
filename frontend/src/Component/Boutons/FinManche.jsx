@@ -6,7 +6,7 @@ export class FinManche extends Component {
     render() {
         return (
             <div className="FinMancheDiv" onClick={this.props.select_player}>
-                FinManche
+                Fin manche
             </div>
         );
     }

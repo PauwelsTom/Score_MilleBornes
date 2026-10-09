@@ -4,7 +4,8 @@ import { Component } from 'react';
 import { PlayerList } from './Component/PlayerList';
 import { AddPlayer } from './Component/Boutons/AddPlayer';
 import { PlayerManager } from './Component/PlayerManager';
-import { ResetScores } from './Component/Boutons/ResetScores';
+import { QuitterPartie } from './Component/Boutons/QuitterPartie';
+import { DebutPartie } from './Component/Boutons/DebutPartie';
 import { FinManche } from './Component/Boutons/FinManche';
 
 export default class App extends Component {
@@ -13,9 +14,42 @@ export default class App extends Component {
     const players = this.loadPlayers();
     this.state = {
       players: players,
-      selectedPlayer: [],
-      inGame: Object.values(players).some(score => score !== 0),
+      inGame: localStorage.getItem('inGame') === 'true' || Object.values(players).some(score => score !== 0),
+      teams: this.loadTeams(),
+      gains: this.loadGains(), // Points gagnés a la derniere manche ({nom: points})
+      scoring: false, // true quand on est sur la page de saisie des scores
+      round: 0,
+      roundDone: false,
     };
+  }
+
+  // Recupere les equipes de la derniere manche
+  loadTeams = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('teams'));
+      if (Array.isArray(saved) && saved.every(team => Array.isArray(team)))
+        return saved;
+    } catch (error) {
+      // Sauvegarde illisible, on repart sans equipes
+    }
+    return [];
+  }
+
+  // Recupere les points gagnés a la derniere manche
+  loadGains = () => {
+    const gains = {};
+    try {
+      const saved = JSON.parse(localStorage.getItem('gains'));
+      if (saved !== null && typeof saved === 'object' && !Array.isArray(saved)) {
+        for (const name of Object.keys(saved)) {
+          if (Number.isFinite(saved[name]))
+            gains[name] = saved[name];
+        }
+      }
+    } catch (error) {
+      // Sauvegarde illisible, on n'affiche pas les gains
+    }
+    return gains;
   }
 
   // Recupere les joueurs sauvegardés (en ignorant les donnees invalides)
@@ -40,6 +74,24 @@ export default class App extends Component {
     localStorage.setItem('players', JSON.stringify(players_));
   }
 
+  // Met a jour l'etat de la partie (en cours ou non)
+  updateInGame = (inGame) => {
+    this.setState({inGame: inGame});
+    localStorage.setItem('inGame', inGame);
+  }
+
+  // Met a jour les equipes
+  updateTeams = (teams) => {
+    this.setState({teams: teams});
+    localStorage.setItem('teams', JSON.stringify(teams));
+  }
+
+  // Met a jour les points gagnés a la derniere manche
+  updateGains = (gains) => {
+    this.setState({gains: gains});
+    localStorage.setItem('gains', JSON.stringify(gains));
+  }
+
   // Ajoute un joueur a la liste
   add_player = () => {
     const input = window.prompt("Nom du nouveau joueur:");
@@ -57,43 +109,50 @@ export default class App extends Component {
     this.updatePlayer(updatedPlayers);
   }
 
-  // Change de page pour un joueur
+  // Termine la selection des joueurs
+  start_game = () => {
+    if (Object.keys(this.state.players).length < 2) {
+      window.alert("Il faut au moins 2 joueurs pour commencer une partie.");
+      return;
+    }
+    this.updateInGame(true);
+  }
+
+  // Va sur la page de saisie des scores
   select_player = () => {
     if (Object.keys(this.state.players).length === 0)
       return;
 
-    document.getElementById("MainPage").style.transform = "translateX(-100vw)";
-    document.getElementById("PlayerPage").style.transform = "translateX(-100vw)";
-    this.setState({selectedPlayer: Object.keys(this.state.players)});
+    // Apres une manche validée, on repart d'une saisie vide
+    this.setState((prevState) => ({
+      scoring: true,
+      round: prevState.roundDone ? prevState.round + 1 : prevState.round,
+      roundDone: false,
+    }));
   }
 
-  remove_seleceted = (toRemove) => {
-    let res = [...this.state.selectedPlayer];
-    for (const rem of toRemove) {res = res.filter(name => name !== rem);}
-    this.setState({selectedPlayer: res});
-    return res.length;
+  // Revient sur la page principale sans valider les scores
+  back_to_main = () => {
+    this.setState({scoring: false});
   }
 
-  // Ajoute une valeur a un score
-  add_score = (name, add, capot) => {
+  // Ajoute les scores de la manche (scores: {nom: points})
+  add_scores = (scores, teams) => {
     const updatedPlayers = { ...this.state.players };
-    for (const n of name) {updatedPlayers[n] += add;}
-
-    if (capot) {
-      for (const n of Object.keys(updatedPlayers)) {
-       // Si n n'est pas present dans la liste name, alors on ajoute 500
-        if (!name.includes(n))
-          updatedPlayers[n] += 500;
-      }
+    for (const name of Object.keys(scores)) {
+      if (name in updatedPlayers)
+        updatedPlayers[name] += scores[name];
     }
     this.updatePlayer(updatedPlayers);
-    this.setState({ inGame: true });
+    this.updateGains(scores);
+    this.updateTeams(teams);
+    this.setState({scoring: false, roundDone: true});
   }
 
-  // Remet les scores a 0
-  resetScores = () => {
+  // Quitte la partie et remet les scores a 0
+  quitGame = () => {
     setTimeout(() => {
-      if (!window.confirm("Voulez-vous remettre a 0 les scores ?"))
+      if (!window.confirm("Voulez-vous quitter la partie ? Les scores seront remis a 0."))
         return;
       
       const updatedPlayers = { ...this.state.players };
@@ -101,7 +160,10 @@ export default class App extends Component {
         updatedPlayers[player] = 0;
       }
       this.updatePlayer(updatedPlayers);
-      this.setState({ inGame: false });
+      this.updateGains({});
+      this.updateTeams([]);
+      this.updateInGame(false);
+      this.setState({scoring: false});
     }, 200);
   }
 
@@ -116,25 +178,29 @@ export default class App extends Component {
   }
 
   render() {
+    const inGame = this.state.inGame;
+    const pageStyle = { transform: this.state.scoring ? "translateX(-100vw)" : "translateX(0vw)" };
+
     return (
       <div className="App">
-        <div id="MainPage">
+        <div id="MainPage" style={pageStyle}>
           <span className='TitrePage'>1000 Bornes</span>
           {
-            this.gameFinished()?
-              <ResetScores reset={this.resetScores}/>
-              :<FinManche select_player={this.select_player}/>
-          }
-          <span className="ListeJoueurTitre">Liste des joueurs</span>
-          <PlayerList players={this.state.players} remove_player={this.remove_player} inGame={this.state.inGame} />
-          { 
-            this.state.inGame ?
-              <ResetScores reset={this.resetScores}/>
+            inGame ?
+              <QuitterPartie quit={this.quitGame}/>
               : <AddPlayer add_player={this.add_player} />
           }
+          <span className="ListeJoueurTitre">Liste des joueurs</span>
+          <PlayerList players={this.state.players} remove_player={this.remove_player} inGame={inGame} gains={this.state.gains} />
+          { !inGame && <DebutPartie start={this.start_game}/> }
+          { inGame && !this.gameFinished() && <FinManche select_player={this.select_player}/> }
         </div>
-        <div id="PlayerPage">
-          <PlayerManager name={this.state.selectedPlayer} add_score={this.add_score} remove_seleceted={this.remove_seleceted} number_player={Object.keys(this.state.players).length} players={this.state.players}/>
+        <div id="PlayerPage" style={pageStyle}>
+          {
+            inGame &&
+              <PlayerManager key={this.state.round} players={Object.keys(this.state.players)} teams={this.state.teams}
+                on_back={this.back_to_main} on_confirm={this.add_scores}/>
+          }
         </div>
       </div>
     );

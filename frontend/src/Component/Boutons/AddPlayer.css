@@ -8,12 +8,12 @@
     text-align: center;
 
     background-color: var(--background-color);
-    color: var(--vert);
+    color: var(--bleu-fonce);
 
     height: 10vh;
     width: 90vw;
 
-    border: 5px solid var(--vert);
+    border: 5px solid var(--bleu-fonce);
     border-radius: 5vh;
 
     margin-top: 1vh;
@@ -29,21 +29,21 @@
 /* Pour les pc */
 @media (min-width: 1024px) {
     .AddPlayerDiv:hover {
-        background-color: var(--vert);
+        background-color: var(--bleu-fonce);
         color: var(--background-color);
     }
 
     /* .BoutonValiderManager:active, */
     .AddPlayerDiv.clicked {
         background-color: var(--background-color);
-        color: var(--vert);
+        color: var(--bleu-fonce);
     }
 }
 
 /* Pour les mobiles */
 @media (max-width: 1023px) {
     .AddPlayerDiv.clicked {
-        background-color: var(--vert);
+        background-color: var(--bleu-fonce);
         color: var(--background-color);
     }
 }
