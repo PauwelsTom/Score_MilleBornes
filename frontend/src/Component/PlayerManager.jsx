@@ -150,6 +150,8 @@ export class PlayerManager extends Component {
                     <div className="kmDiv">
                         <input
                             type="number"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             value={kmText === null ? kilometres : kmText}
                             onChange={this.handleNumberChange}
                             onFocus={this.onFocusNumber}
