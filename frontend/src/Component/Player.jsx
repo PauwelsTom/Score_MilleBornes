@@ -2,7 +2,7 @@ import { Component } from "react";
 import "./Player.css"
 import { iconeCroix, iconeRank } from "../Data";
 
-// name, score, remove_player, rank, inGame, gain
+// name, score, remove_player, rank, inGame, gain, winner, finished
 export class Player extends Component {
     render() {
         const name = this.props.name;
@@ -15,7 +15,10 @@ export class Player extends Component {
         const inGameStyle = { visibility: this.props.inGame ? "visible" : "hidden" };
         const notInGameStyle = { visibility: this.props.inGame ? "hidden" : "visible" };
 
-        const playerClass = score >= 5000 ? "PlayerDiv PlayerWin" : "PlayerDiv";
+        // Le vainqueur en vert, les autres joueurs a 5000 ou plus en vert clair
+        let playerClass = "PlayerDiv";
+        if (this.props.winner) { playerClass = "PlayerDiv PlayerWin"; }
+        else if (this.props.finished) { playerClass = "PlayerDiv PlayerFinished"; }
 
         return (
             <div className={playerClass}>

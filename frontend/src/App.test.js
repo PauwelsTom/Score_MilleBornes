@@ -194,9 +194,71 @@ test('picking a player already in a team rearranges the teams', () => {
   expect(within(panneau(container)).getByText('Bob & Emma')).toBeInTheDocument();
 });
 
+test('scores count up for 3 seconds after a round', () => {
+  jest.useFakeTimers();
+  const container = startRound({ Alice: 100, Bob: 0 });
+  const names = () => Array.from(container.querySelectorAll('.PlayerName')).map((n) => n.textContent);
+  const scores = () => Array.from(container.querySelectorAll('.ScorePlayer')).map((s) => Number(s.textContent));
+
+  // Bob fait 1000 km (+1400), Alice fait 25 km
+  fireEvent.click(screen.getByText('Suivant >'));
+  fireEvent.click(panneau(container).querySelector('.milleBornes'));
+  fireEvent.click(within(container.querySelector('.OngletsDiv')).getByText('Alice'));
+  fireEvent.change(panneau(container).querySelector('.CategoryInput'), { target: { value: '25' } });
+  fireEvent.click(screen.getByText('Suivant >'));
+  fireEvent.click(screen.getByText('Confirmer'));
+  expect(savedPlayers()).toEqual({ Alice: 125, Bob: 1400 });
+
+  // Au depart les anciens scores sont affichés, dans l'ancien ordre
+  expect(names()).toEqual(['Alice', 'Bob']);
+  expect(scores()).toEqual([100, 0]);
+
+  // A mi-parcours Bob est passé devant
+  act(() => { jest.advanceTimersByTime(1800); });
+  expect(names()).toEqual(['Bob', 'Alice']);
+  expect(scores()[0]).toBeGreaterThan(400);
+  expect(scores()[0]).toBeLessThan(1000);
+
+  act(() => { jest.advanceTimersByTime(2000); });
+  expect(scores()).toEqual([1400, 125]);
+});
+
+test('confettis fall when a player reaches 5000', () => {
+  jest.useFakeTimers();
+  const container = startRound({ Alice: 4000, Bob: 0 });
+  fireEvent.click(panneau(container).querySelector('.milleBornes'));
+  fireEvent.click(screen.getByText('Suivant >'));
+  fireEvent.change(panneau(container).querySelector('.CategoryInput'), { target: { value: '25' } });
+  fireEvent.click(screen.getByText('Confirmer'));
+
+  // Pas de vainqueur tant que les scores ne sont pas figés, meme au dessus de 5000
+  act(() => { jest.advanceTimersByTime(3000); });
+  expect(Number(container.querySelector('.ScorePlayer').textContent)).toBeGreaterThan(5000);
+  expect(container.querySelector('.ConfettisDiv')).toBeNull();
+  expect(container.querySelector('.PlayerWin')).toBeNull();
+
+  act(() => { jest.advanceTimersByTime(500); });
+  expect(container.querySelector('.ConfettisDiv')).not.toBeNull();
+  expect(within(container.querySelector('.PlayerWin')).getByText('Alice')).toBeInTheDocument();
+
+  act(() => { jest.advanceTimersByTime(6000); });
+  expect(container.querySelector('.ConfettisDiv')).toBeNull();
+});
+
 test('Fin manche is hidden once a player reaches 5000', () => {
-  localStorage.setItem('players', JSON.stringify({ Alice: 5200, Bob: 300 }));
-  render(<App />);
+  localStorage.setItem('players', JSON.stringify({ Alice: 5200, Bob: 300, Chloe: 5600 }));
+  const { container } = render(<App />);
+  expect(container.querySelector('.ConfettisDiv')).toBeNull();
+
+  // Seul le joueur avec le plus de points est vainqueur
+  const winners = container.querySelectorAll('.PlayerWin');
+  expect(winners).toHaveLength(1);
+  expect(within(winners[0]).getByText('Chloe')).toBeInTheDocument();
+
+  // Les autres joueurs a 5000 ou plus sont en vert clair
+  const finished = container.querySelectorAll('.PlayerFinished');
+  expect(finished).toHaveLength(1);
+  expect(within(finished[0]).getByText('Alice')).toBeInTheDocument();
   expect(screen.getByText('Quitter partie')).toBeInTheDocument();
   expect(screen.queryByText('Fin manche')).toBeNull();
 });

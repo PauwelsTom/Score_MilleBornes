@@ -13,6 +13,8 @@
     margin-top: 1vh;
 
     box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+
+    transition: height 0.3s ease;
 }
 
 .PlayerInfos {
@@ -23,6 +25,13 @@
 
     height: 10vh;
     width: 90vw;
+
+    transition: height 0.3s ease;
+}
+
+/* La case du vainqueur est plus grande */
+.PlayerWin, .PlayerWin .PlayerInfos {
+    height: 14vh;
 }
 
 .PlayerName {
@@ -31,6 +40,12 @@
 
     font-weight: bold;
     font-size: min(6vw, 3vh);
+
+    transition: font-size 0.3s ease;
+}
+
+.PlayerWin .PlayerName, .PlayerWin .ScorePlayer {
+    font-size: min(8vw, 4vh);
 }
 
 .BoutonModifier {
@@ -72,6 +87,8 @@
 .ScorePlayer {
     font-size: min(6vw, 3vh);
     font-weight: bolder;
+
+    transition: font-size 0.3s ease;
 }
 
 .SupprPlayerDiv {
@@ -89,7 +106,11 @@
     background-color: var(--vert);
 }
 
+.PlayerFinished {
+    background-color: var(--vert-clair);
+}
+
 /* Fond vert : le gain resterait illisible en vert */
-.PlayerWin .GainPlayer {
+.PlayerWin .GainPlayer, .PlayerFinished .GainPlayer {
     color: inherit;
 }

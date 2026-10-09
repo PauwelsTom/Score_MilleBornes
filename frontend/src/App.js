@@ -7,6 +7,15 @@ import { PlayerManager } from './Component/PlayerManager';
 import { QuitterPartie } from './Component/Boutons/QuitterPartie';
 import { DebutPartie } from './Component/Boutons/DebutPartie';
 import { FinManche } from './Component/Boutons/FinManche';
+import { Confettis } from './Component/Confettis';
+
+// Animation des scores en fin de manche (en ms)
+const ANIMATION_DELAY = 300; // Le temps de revenir sur la page principale
+const ANIMATION_DURATION = 3000;
+const CONFETTIS_DURATION = 6000;
+
+// Verifie si un joueur a atteint les 5000 points
+const hasWinner = (players) => Object.values(players).some(score => score >= 5000);
 
 export default class App extends Component {
   constructor(props) {
@@ -17,6 +26,8 @@ export default class App extends Component {
       inGame: localStorage.getItem('inGame') === 'true' || Object.values(players).some(score => score !== 0),
       teams: this.loadTeams(),
       gains: this.loadGains(), // Points gagnés a la derniere manche ({nom: points})
+      displayedPlayers: null, // Scores affichés pendant l'animation de fin de manche
+      confettis: false,
       scoring: false, // true quand on est sur la page de saisie des scores
       round: 0,
       roundDone: false,
@@ -123,6 +134,8 @@ export default class App extends Component {
     if (Object.keys(this.state.players).length === 0)
       return;
 
+    this.stopAnimation();
+
     // Apres une manche validée, on repart d'une saisie vide
     this.setState((prevState) => ({
       scoring: true,
@@ -143,10 +156,69 @@ export default class App extends Component {
       if (name in updatedPlayers)
         updatedPlayers[name] += scores[name];
     }
+    this.animateScores(this.state.players, updatedPlayers);
     this.updatePlayer(updatedPlayers);
     this.updateGains(scores);
     this.updateTeams(teams);
     this.setState({scoring: false, roundDone: true});
+  }
+
+  // Fait monter les scores affichés des anciens vers les nouveaux
+  animateScores = (from, to) => {
+    this.stopAnimation();
+    this.setState({displayedPlayers: from});
+
+    let start = null;
+    const step = () => {
+      const now = performance.now();
+      if (start === null)
+        start = now + ANIMATION_DELAY;
+
+      const progress = Math.min(Math.max((now - start) / ANIMATION_DURATION, 0), 1);
+      if (progress === 1) {
+        this.stopAnimation();
+        return;
+      }
+
+      const displayed = {};
+      for (const name of Object.keys(to)) {
+        displayed[name] = Math.round(from[name] + (to[name] - from[name]) * progress);
+      }
+      this.setState({displayedPlayers: displayed});
+      this.animationFrame = requestAnimationFrame(step);
+    };
+    this.animationFrame = requestAnimationFrame(step);
+  }
+
+  // Arrete l'animation et affiche les vrais scores
+  stopAnimation = () => {
+    cancelAnimationFrame(this.animationFrame);
+    this.setState({displayedPlayers: null});
+  }
+
+  // Renvoie les vainqueurs : ceux qui ont le plus de points, une fois les scores figés
+  getWinners = (state) => {
+    if (state.displayedPlayers !== null || !hasWinner(state.players))
+      return [];
+
+    const best = Math.max(...Object.values(state.players));
+    return Object.keys(state.players).filter(name => state.players[name] === best);
+  }
+
+  // Lance les confettis au moment ou le vainqueur est connu
+  componentDidUpdate(prevProps, prevState) {
+    const hadWinner = this.getWinners(prevState).length > 0;
+    const winner = this.getWinners(this.state).length > 0;
+    if (winner && !hadWinner) {
+      clearTimeout(this.confettisTimeout);
+      this.setState({confettis: true});
+      this.confettisTimeout = setTimeout(() => this.setState({confettis: false}), CONFETTIS_DURATION);
+    }
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.animationFrame);
+    clearTimeout(this.confettisTimeout);
   }
 
   // Quitte la partie et remet les scores a 0
@@ -159,6 +231,7 @@ export default class App extends Component {
       for (const player of Object.keys(updatedPlayers)) {
         updatedPlayers[player] = 0;
       }
+      this.stopAnimation();
       this.updatePlayer(updatedPlayers);
       this.updateGains({});
       this.updateTeams([]);
@@ -169,12 +242,7 @@ export default class App extends Component {
 
   // Verifie si une partie est finie
   gameFinished = () => {
-    const players = this.state.players;
-    for (const p of Object.keys(players)) {
-      if (players[p] >= 5000)
-        return true;
-    }
-    return false;
+    return hasWinner(this.state.players);
   }
 
   render() {
@@ -191,10 +259,11 @@ export default class App extends Component {
               : <AddPlayer add_player={this.add_player} />
           }
           <span className="ListeJoueurTitre">Liste des joueurs</span>
-          <PlayerList players={this.state.players} remove_player={this.remove_player} inGame={inGame} gains={this.state.gains} />
+          <PlayerList players={this.state.displayedPlayers || this.state.players} remove_player={this.remove_player} inGame={inGame} gains={this.state.gains} winners={this.getWinners(this.state)} />
           { !inGame && <DebutPartie start={this.start_game}/> }
           { inGame && !this.gameFinished() && <FinManche select_player={this.select_player}/> }
         </div>
+        { this.state.confettis && <Confettis /> }
         <div id="PlayerPage" style={pageStyle}>
           {
             inGame &&
