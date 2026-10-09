@@ -10,13 +10,28 @@ import { FinManche } from './Component/Boutons/FinManche';
 export default class App extends Component {
   constructor(props) {
     super(props);
+    const players = this.loadPlayers();
     this.state = {
-      players: JSON.parse(localStorage.getItem('players')) || {},
+      players: players,
       selectedPlayer: [],
-      inGame: false,
+      inGame: Object.values(players).some(score => score !== 0),
     };
+  }
 
-    this.add_player = this.add_player.bind(this);
+  // Recupere les joueurs sauvegardés (en ignorant les donnees invalides)
+  loadPlayers = () => {
+    const players = {};
+    try {
+      const saved = JSON.parse(localStorage.getItem('players'));
+      if (saved !== null && typeof saved === 'object' && !Array.isArray(saved)) {
+        for (const name of Object.keys(saved)) {
+          players[name] = Number.isFinite(saved[name]) ? saved[name] : 0;
+        }
+      }
+    } catch (error) {
+      // Sauvegarde illisible, on repart d'une liste vide
+    }
+    return players;
   }
 
   // Met a jour la liste des joueurs
@@ -27,8 +42,9 @@ export default class App extends Component {
 
   // Ajoute un joueur a la liste
   add_player = () => {
-    const name = window.prompt("Nom du nouveau joueur:");
-    if (name != null && name !== "") {
+    const input = window.prompt("Nom du nouveau joueur:");
+    const name = input == null ? "" : input.trim();
+    if (name !== "" && !(name in this.state.players)) {
       const updatedPlayers = { ...this.state.players, [name]: 0 };
       this.updatePlayer(updatedPlayers);
     }
@@ -42,7 +58,10 @@ export default class App extends Component {
   }
 
   // Change de page pour un joueur
-  select_player = (name) => {
+  select_player = () => {
+    if (Object.keys(this.state.players).length === 0)
+      return;
+
     document.getElementById("MainPage").style.transform = "translateX(-100vw)";
     document.getElementById("PlayerPage").style.transform = "translateX(-100vw)";
     this.setState({selectedPlayer: Object.keys(this.state.players)});
@@ -68,10 +87,7 @@ export default class App extends Component {
       }
     }
     this.updatePlayer(updatedPlayers);
-    if (!this.state.inGame)
-      this.setState({ inGame: true });
-    
-    this.inGameVisibility();
+    this.setState({ inGame: true });
   }
 
   // Remet les scores a 0
@@ -86,28 +102,7 @@ export default class App extends Component {
       }
       this.updatePlayer(updatedPlayers);
       this.setState({ inGame: false });
-      this.inGameVisibility();
     }, 200);
-  }
-
-  // Cache / affiche les elements si on est en partie
-  inGameVisibility = () => {
-    setTimeout(() => {
-      const elements = Array.from(document.getElementsByClassName('SupprPlayerDiv'));
-      elements.forEach((element) => {
-        element.style.visibility = this.state.inGame? "hidden": "visible";
-      });
-
-      const images = Array.from(document.getElementsByClassName('IconeClassement'));
-      images.forEach((image) => {
-        image.style.visibility = this.state.inGame? "visible": "hidden";
-      });
-
-      const scores = Array.from(document.getElementsByClassName('ScorePlayer'));
-      scores.forEach((image) => {
-        image.style.visibility = this.state.inGame? "visible": "hidden";
-      });
-    }, 10);
   }
 
   // Verifie si une partie est finie
@@ -118,16 +113,6 @@ export default class App extends Component {
         return true;
     }
     return false;
-  }
-
-  componentDidMount() {
-    for (const player of Object.keys(this.state.players)) {
-      if (this.state.players[player] !== 0)
-          this.setState({ inGame: true })
-    }
-    setTimeout(() => {
-      this.inGameVisibility();
-    }, 10);
   }
 
   render() {
@@ -141,7 +126,7 @@ export default class App extends Component {
               :<FinManche select_player={this.select_player}/>
           }
           <span className="ListeJoueurTitre">Liste des joueurs</span>
-          <PlayerList players={this.state.players} remove_player={this.remove_player} />
+          <PlayerList players={this.state.players} remove_player={this.remove_player} inGame={this.state.inGame} />
           { 
             this.state.inGame ?
               <ResetScores reset={this.resetScores}/>

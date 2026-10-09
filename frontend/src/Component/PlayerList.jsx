@@ -3,12 +3,8 @@ import "./PlayerList.css"
 import { Component } from "react";
 import { Player } from "./Player";
 
-// players, remove_player
+// players, remove_player, inGame
 export class PlayerList extends Component {
-    constructor(props) {
-        super();
-    }
-
     get_rank = (name) => {
         const players = this.props.players;
         const sortedPlayers = Object.entries(players)
@@ -56,8 +52,8 @@ export class PlayerList extends Component {
                 
                 {Object.keys(players)
                     .sort((a, b) => players[b] - players[a])
-                    .map((name, rank) => (
-                        <Player key={rank} name={name} score={players[name]} remove_player={remove_player} rank={this.get_rank(name)}/>
+                    .map((name) => (
+                        <Player key={name} name={name} score={players[name]} remove_player={remove_player} inGame={this.props.inGame} rank={this.get_rank(name)}/>
                     )
                 )}
             </div>

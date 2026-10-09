@@ -3,59 +3,43 @@ import "./PlayerManager.css";
 import { clickAnimation } from "../fonctions";
 import { iconeMille } from "../Data";
 
+// Valeurs de depart pour la saisie d'un joueur
+const initialValues = {
+    kilometres: 0,
+    kmText: null, // Texte affiché pendant la saisie des kilometres (null = pas en cours de saisie)
+    botte: 0,
+    cf: 0,
+    allonge: false,
+    couronnement: false,
+    pas200: false,
+};
+
 // name, add_score, remove_seleceted, number_player
 export class PlayerManager extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            score: 0,
-            activeBotte: "Botte0",
-            activeCF: "CF0",
+            ...initialValues,
+            equipier: "", // "" = Aucun
         };
-
-        this.kilometres = 0;
-        this.botte = 0;
-        this.cf = 0;
-        this.allonge = false;
-        this.couronnement = false;
-        this.pas200 = false;
-        this.equipier = "Aucun";
     }
 
     // Gere quand on clique sur un bouton chiffre
     handleClickBouton = (event) => {
-        const { id, value, idTemplate } = event.target.dataset;
+        const { value, idTemplate } = event.currentTarget.dataset;
+        const number = parseInt(value, 10);
 
         this.setState((prevState) => {
-            const currentActive = prevState[`active${idTemplate}`];
-            if (currentActive === id) {
-                return null; // Le bouton est déjà actif, on ne fait rien
-            }
+            const botte = idTemplate === "Botte" ? number : prevState.botte;
+            const cf = idTemplate === "CF" ? number : prevState.cf;
 
-            // Mettre à jour le bouton actif pour la catégorie et les variables this.botte et this.cf
-            const updatedState = {
-                [`active${idTemplate}`]: id,
-                [`${idTemplate.toLowerCase()}`]: parseInt(value),
-            };
-
-            if (idTemplate === "Botte") {
-                this.botte = parseInt(value);
-            } else if (idTemplate === "CF") {
-                this.cf = parseInt(value);
-            }
-
-            if (this.botte < this.cf) 
-                document.getElementById("CF" + this.botte.toString()).click();
-
-            this.updateScore();
-
-            return updatedState;
+            // On ne peut pas avoir plus de coup-fourrés que de bottes
+            return { botte: botte, cf: Math.min(cf, botte) };
         });
     }
 
     handleMilleBornes = () => {
-        this.kilometres = 1000;
-        this.updateScore();
+        this.setState({ kilometres: 1000, kmText: null });
     }
 
     // Gere le changement dans les checkbox
@@ -63,134 +47,110 @@ export class PlayerManager extends Component {
         const { id, checked } = event.target;
         switch(id) {
             case "couronnement":
-                this.couronnement = checked;
-                break;
-
             case "pas200":
-                this.pas200 = checked;
-                break;
-
             case "allonge":
-                this.allonge = checked;
+                this.setState({ [id]: checked });
                 break;
 
             default:
                 break;
         }
+    }
 
-        this.updateScore();
+    // Convertit la saisie en un nombre de kilometres entre 0 et 1000
+    parseKilometres = (value) => {
+        const kilometres = parseInt(value, 10);
+        if (isNaN(kilometres)) {
+            return 0;
+        }
+        return Math.min(Math.max(kilometres, 0), 1000);
     }
 
     // Gere le changement du nombre de kilometres
     handleNumberChange = (event) => {
         const value = event.target.value;
-        if (value > 1000) {
-            event.target.value = 1000;
-            return this.handleNumberChange(event);
-        }
-        this.kilometres = parseInt(value);
-        this.updateScore();
+        const kilometres = this.parseKilometres(value);
+        this.setState({ kilometres: kilometres, kmText: value === "" ? "" : kilometres.toString() });
     }
 
-    // Calcule et met a jour le score
-    updateScore = () => {
-        this.setState({
-            score: this.kilometres + 100 * this.botte + 300 * this.cf +
-                   400 * (this.kilometres === 1000 ? 1 : 0) + 300 * (this.pas200 ? 1 : 0) 
-                   + 300 * this.couronnement
-                   + (this.botte === 4? 1 : 0) * 700 + (this.allonge? 1 : 0) * 200
-        });
+    // Calcule le score
+    getScore = () => {
+        const { kilometres, botte, cf, allonge, couronnement, pas200 } = this.state;
+        return kilometres + 100 * botte + 300 * cf +
+               400 * (kilometres === 1000 ? 1 : 0) + 300 * (pas200 ? 1 : 0)
+               + 300 * (couronnement ? 1 : 0)
+               + (botte === 4 ? 1 : 0) * 700 + (allonge ? 1 : 0) * 200;
+    }
+
+    // Renvoie l'equipier selectionné, ou "" s'il n'y en a pas
+    getEquipier = () => {
+        const equipier = this.state.equipier;
+        return this.props.name.slice(1).includes(equipier) ? equipier : "";
     }
 
     // Gere le changement des equipiers
     handleEquipierChange = (event) => {
-        this.equipier = event.target.value;
+        this.setState({ equipier: event.target.value });
     }
 
     // Gere quand on clique sur le bouton valider
     handleValidate = () => {
-        const players = [this.props.name[0]];
-        console.log(this.props.name);
-        if (this.equipier !== "Aucun") { players.push(this.equipier); } // OK
-        this.props.add_score(players, this.state.score, this.kilometres === 0);
-        const playerRemaining = this.props.remove_seleceted(players);
-        this.raz();
-        if (playerRemaining === 0) {
+        const name = this.props.name[0];
+        if (name === undefined) {
+            return;
+        }
+
+        const equipier = this.getEquipier();
+        const players = equipier === "" ? [name] : [name, equipier];
+        this.props.add_score(players, this.getScore(), this.state.kilometres === 0);
+
+        const playerRemaining = this.props.name.filter((n) => !players.includes(n));
+        this.props.remove_seleceted(players);
+
+        // Si le joueur validé avait un équipier, on propose au prochain joueur le suivant de la liste
+        const nextEquipier = equipier !== "" && playerRemaining.length > 1 ? playerRemaining[1] : "";
+        this.setState({ ...initialValues, equipier: nextEquipier });
+
+        if (playerRemaining.length === 0) {
             this.retourMainPage();
-            this.equipier = "Aucun";
         }
         clickAnimation("BoutonValiderManager");
     }
 
-    // Remet a zero toutes les valeurs
-    raz = () => {
-        document.getElementById('kilometres').value = 0;
-        document.getElementById('Botte0').click();
-        document.getElementById('CF0').click();
-        this.props.number_player === 4 ? this.allonge = false : document.getElementById('allonge').checked = false;
-        document.getElementById('couronnement').checked = false;
-        document.getElementById('pas200').checked = false;
-        
-        this.kilometres = 0;
-        this.botte = 0;
-        this.cf = 0;
-        this.allonge = false;
-        this.couronnement = false;
-        this.pas200 = false;
-    
-        // Si le joueur validé avait un équipier, mettre le prochain joueur avec le premier de la liste
-        if (this.equipier === undefined) {
-            this.equipier = "Aucun"
-        }
-        if (this.equipier !== "Aucun") {
-            setTimeout(() => {
-                this.equipier = this.props.name[1]; // Prend le premier joueur de la liste comme équipier
-                if (this.equipier === undefined) { this.equipier = "Aucun"; }
-                document.getElementById('equipierSelect').value = this.equipier;
-            }, 10);
-        } else {
-            this.equipier = "Aucun";
-        }
-    
-        this.setState({ score: 0, activeBotte: "Botte0", activeCF: "CF0" });
-    }
-    
-    
     // Fonction pour retourner a la page principale
     retourMainPage = () => {
         document.getElementById("MainPage").style.transform = "translateX(0vw)";
         document.getElementById("PlayerPage").style.transform = "translateX(100vw)";
-        this.raz();
     }
 
     // Quand on clique sur les kilometres
-    onFocusNumber = (event) => {
-        event.target.value = "";
+    onFocusNumber = () => {
+        this.setState({ kmText: "" });
     }
 
     // Quand on quitte la zone des kilomtres
-    onBlurNumber = (event) => {
-        if (event.target.value % 25 !== 0) {
-            event.target.value = event.target.value - (event.target.value % 25);
-        }
-        this.handleNumberChange(event);
+    onBlurNumber = () => {
+        this.setState((prevState) => ({
+            kilometres: prevState.kilometres - (prevState.kilometres % 25),
+            kmText: null,
+        }));
     }
 
     render() {
         const name = this.props.name[0];
-        const { activeBotte, activeCF } = this.state;
+        const { kilometres, kmText, botte, cf } = this.state;
 
         return (
             <div className="PlayerManagerDiv">
                 <span className="PlayerNameManager">{name}</span>
-                <span className="PlayerScoreManager">{"+ " + this.state.score}</span>
+                <span className="PlayerScoreManager">{"+ " + this.getScore()}</span>
 
                 <div className="ManagerCategory">
                     <span className="CategoryName">Kilomètres</span>
                     <div className="kmDiv">
                         <input
                             type="number"
-                            value={this.kilometres}
+                            value={kmText === null ? kilometres : kmText}
                             onChange={this.handleNumberChange}
                             onFocus={this.onFocusNumber}
                             onBlur={this.onBlurNumber}
@@ -210,10 +170,9 @@ export class PlayerManager extends Component {
                         <div
                             key={`Botte${i}`}
                             id={`Botte${i}`}
-                            data-id={`Botte${i}`}
                             data-value={i}
                             data-id-template="Botte"
-                            className={`BoutonNumero ${activeBotte === `Botte${i}` ? 'active' : ''}`}
+                            className={`BoutonNumero ${botte === i ? 'active' : ''}`}
                             onClick={this.handleClickBouton}
                         >
                             {i}
@@ -227,10 +186,9 @@ export class PlayerManager extends Component {
                         <div
                             key={`CF${i}`}
                             id={`CF${i}`}
-                            data-id={`CF${i}`}
                             data-value={i}
                             data-id-template="CF"
-                            className={`BoutonNumero ${activeCF === `CF${i}` ? 'active' : ''}`}
+                            className={`BoutonNumero ${cf === i ? 'active' : ''}`}
                             onClick={this.handleClickBouton}
                         >
                             {i}
@@ -245,7 +203,7 @@ export class PlayerManager extends Component {
                         <span className="CategoryName">Allonge</span>
                         <input
                             type="checkbox"
-                            checked={this.allonge}
+                            checked={this.state.allonge}
                             onChange={this.handleCheckboxChange}
                             className="CategoryCheckbox"
                             id="allonge"
@@ -257,7 +215,7 @@ export class PlayerManager extends Component {
                     <span className="CategoryName">Couronnement</span>
                     <input
                         type="checkbox"
-                        checked={this.couronnement}
+                        checked={this.state.couronnement}
                         onChange={this.handleCheckboxChange}
                         className="CategoryCheckbox"
                         id="couronnement"
@@ -268,7 +226,7 @@ export class PlayerManager extends Component {
                     <span className="CategoryName">Pas de 200</span>
                     <input
                         type="checkbox"
-                        checked={this.pas200}
+                        checked={this.state.pas200}
                         onChange={this.handleCheckboxChange}
                         className="CategoryCheckbox"
                         id="pas200"
@@ -277,9 +235,10 @@ export class PlayerManager extends Component {
 
                 <div className="ManagerCategory">
                     <span className="CategoryName">Equipier</span>
-                    <select id="equipierSelect" className="EquipierSelect" onChange={this.handleEquipierChange}>
-                        {this.props.name.map((playerName, index) => (
-                            <option key={index} value={playerName}>{playerName === name? "Aucun": playerName}</option>
+                    <select id="equipierSelect" className="EquipierSelect" value={this.getEquipier()} onChange={this.handleEquipierChange}>
+                        <option value="">Aucun</option>
+                        {this.props.name.slice(1).map((playerName) => (
+                            <option key={playerName} value={playerName}>{playerName}</option>
                         ))}
                     </select>
                 </div>
