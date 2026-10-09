@@ -221,7 +221,21 @@ export class PlayerManager extends Component {
         const rounded = tabs.map((tab) => ({ ...tab, kilometres: tab.kilometres - (tab.kilometres % 25) }));
         const scores = getRoundScores(rounded, this.props.players);
 
-        this.props.on_confirm(scores, tabs.map((tab) => tab.members));
+        // Details de la manche de chaque joueur, pour les succès de fin de partie
+        const details = {};
+        for (const tab of rounded) {
+            for (const name of tab.members) {
+                details[name] = {
+                    points: scores[name],
+                    bottes: tab.botte,
+                    cf: tab.cf,
+                    capot: tab.kilometres === 0,
+                    couronnement: tab.couronnement,
+                };
+            }
+        }
+
+        this.props.on_confirm(scores, tabs.map((tab) => tab.members), details);
     }
 
     // Affiche la saisie d'un onglet

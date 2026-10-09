@@ -30,7 +30,7 @@ export class Player extends Component {
                     <span className="PlayerName">{name}</span>
                     <div className="ScorePlayerDiv" style={inGameStyle}>
                         <span className="ScorePlayer">{score}</span>
-                        {gain !== undefined && <span className={gain <= 100 ? "GainPlayer GainFaible" : "GainPlayer"}>{"(+" + gain + ")"}</span>}
+                        {gain !== undefined && <span className={gain < 500 ? "GainPlayer GainFaible" : "GainPlayer"}>{"(+" + gain + ")"}</span>}
                     </div>
                     <img src={image} alt="Classement" height="90%" className="IconeClassement" style={inGameStyle}/>
                 </div>

@@ -1,0 +1,50 @@
+@import url("../../Colors.css");
+
+.VoirSuccesDiv {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    background-color: var(--background-color);
+    color: var(--bleu-fonce);
+
+    height: 10vh;
+    width: 90vw;
+
+    border: 5px solid var(--bleu-fonce);
+    border-radius: 5vh;
+
+    margin-top: 1vh;
+
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
+
+    transition: background-color 0.3s ease;
+
+    font-size: 5vh;
+    font-weight: bolder;
+}
+
+
+/* Pour les pc */
+@media (min-width: 1024px) {
+    .VoirSuccesDiv:hover {
+        background-color: var(--bleu-fonce);
+        color: var(--background-color);
+    }
+
+    /* .BoutonValiderManager:active, */
+    .VoirSuccesDiv.clicked {
+        background-color: var(--background-color);
+        color: var(--bleu-fonce);
+    }
+}
+
+/* Pour les mobiles */
+@media (max-width: 1023px) {
+    .VoirSuccesDiv.clicked {
+        background-color: var(--bleu-fonce);
+        color: var(--background-color);
+    }
+}

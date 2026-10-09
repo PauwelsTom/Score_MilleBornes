@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import App from './App';
+import { getSucces } from './succes';
 
 const savedPlayers = () => JSON.parse(localStorage.getItem('players'));
 
@@ -77,7 +78,7 @@ test('ignores unreadable saved data', () => {
 test('Retour keeps the scores being entered and sends nothing', () => {
   const container = startRound({ Alice: 0, Bob: 0 });
   fireEvent.click(panneau(container).querySelector('.milleBornes'));
-  fireEvent.click(screen.getByText('Retour'));
+  fireEvent.click(within(container.querySelector('#PlayerPage')).getByText('Retour'));
   expect(container.querySelector('#MainPage').style.transform).toBe('translateX(0vw)');
   expect(savedPlayers()).toEqual({ Alice: 0, Bob: 0 });
 
@@ -243,6 +244,75 @@ test('confettis fall when a player reaches 5000', () => {
 
   act(() => { jest.advanceTimersByTime(6000); });
   expect(container.querySelector('.ConfettisDiv')).toBeNull();
+});
+
+const stats = (points, bottes = 0, cf = 0, capot = false, couronnement = false) =>
+  ({ points, bottes, cf, capot, couronnement });
+const succesOf = (history) => Object.fromEntries(getSucces(history).map((s) => [s.title, s]));
+
+test('achievements are computed from the rounds of the game', () => {
+  const succes = succesOf([
+    { Alice: stats(1900, 2, 1, false, true), Bob: stats(200, 1), Chloe: stats(0, 0, 0, true) },
+    { Alice: stats(1500, 1, 1), Bob: stats(600, 3), Chloe: stats(100) },
+  ]);
+
+  expect(succes['Le plus de points en une manche']).toMatchObject({ players: ['Alice'], value: 1900 });
+  expect(succes['Le moins de points en une manche']).toMatchObject({ players: ['Chloe'], value: 0 });
+  expect(succes['Le plus de bottes']).toMatchObject({ players: ['Bob'], value: 4 });
+  expect(succes['Le plus de coups fourrés']).toMatchObject({ players: ['Alice'], value: 2 });
+  expect(succes['Le plus souvent fini capot']).toMatchObject({ players: ['Chloe'], value: 1 });
+  expect(succes['Le plus de couronnements']).toMatchObject({ players: ['Alice'], value: 1 });
+  expect(succes['Que des victoires'].players).toEqual(['Alice']);
+  expect(succes['Que des défaites'].players).toEqual(['Chloe']);
+});
+
+test('conditional achievements are hidden when nobody earned them', () => {
+  const succes = succesOf([
+    { Alice: stats(1900), Bob: stats(200) },
+    { Alice: stats(100), Bob: stats(600) },
+  ]);
+
+  expect(succes['Que des victoires']).toBeUndefined();
+  expect(succes['Que des défaites']).toBeUndefined();
+  // Personne n'a de botte : la statistique n'est pas affichée
+  expect(succes['Le plus de bottes']).toBeUndefined();
+  expect(succes['Le plus de points en une manche']).toMatchObject({ players: ['Alice'], value: 1900 });
+});
+
+test('the achievements page opens once the game is finished', () => {
+  jest.useFakeTimers();
+  const container = startRound({ Alice: 4000, Bob: 0 });
+  expect(screen.queryByText('Succès', { selector: '.VoirSuccesDiv' })).toBeNull();
+
+  // Alice : 1000 km, 1 botte en coup-fourré, couronnement. Bob : capot
+  const [bottes, coupFourres] = panneau(container).querySelectorAll('.ManagerCategory:has(.BoutonNumero)');
+  fireEvent.click(panneau(container).querySelector('.milleBornes'));
+  fireEvent.click(within(bottes).getByText('1'));
+  fireEvent.click(within(coupFourres).getByText('1'));
+  fireEvent.click(panneau(container).querySelectorAll('.CategoryCheckbox')[1]);
+  fireEvent.click(screen.getByText('Suivant >'));
+  fireEvent.click(screen.getByText('Confirmer'));
+  act(() => { jest.advanceTimersByTime(4000); });
+  expect(savedPlayers()).toEqual({ Alice: 6600, Bob: 0 });
+
+  fireEvent.click(screen.getByText('Succès', { selector: '.VoirSuccesDiv' }));
+  expect(container.querySelector('#SuccesPage').style.transform).toBe('translateX(-100vw)');
+  const cards = Array.from(container.querySelectorAll('.SuccesDiv')).map((card) => card.textContent);
+  expect(cards).toEqual([
+    'Que des victoiresAlice',
+    'Que des défaitesBob',
+    'Le plus de points en une mancheAlice2600',
+    'Le moins de points en une mancheBob0',
+    'Le plus de bottesAlice1',
+    'Le plus de coups fourrésAlice1',
+    'Le plus souvent fini capotBob1',
+    'Le plus de couronnementsAlice1',
+  ]);
+  expect(container.querySelectorAll('.SuccesDiv')[0]).toHaveClass('Succesvictoire');
+  expect(container.querySelectorAll('.SuccesDiv')[1]).toHaveClass('Succesdefaite');
+
+  fireEvent.click(within(container.querySelector('#SuccesPage')).getByText('Retour'));
+  expect(container.querySelector('#MainPage').style.transform).toBe('translateX(0vw)');
 });
 
 test('Fin manche is hidden once a player reaches 5000', () => {

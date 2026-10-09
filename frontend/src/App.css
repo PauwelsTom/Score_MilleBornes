@@ -19,7 +19,7 @@
   overflow: hidden;
 }
 
-#MainPage, #PlayerPage {
+#MainPage, #PlayerPage, #SuccesPage {
   position: absolute;
 
   display: flex;
@@ -33,7 +33,7 @@
   transition: transform 0.3s ease; 
 }
 
-#PlayerPage {
+#PlayerPage, #SuccesPage {
   left: 100vw;
 }
 

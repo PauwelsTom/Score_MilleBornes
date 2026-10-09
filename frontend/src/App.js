@@ -8,6 +8,8 @@ import { QuitterPartie } from './Component/Boutons/QuitterPartie';
 import { DebutPartie } from './Component/Boutons/DebutPartie';
 import { FinManche } from './Component/Boutons/FinManche';
 import { Confettis } from './Component/Confettis';
+import { SuccesPage } from './Component/SuccesPage';
+import { VoirSucces } from './Component/Boutons/VoirSucces';
 
 // Animation des scores en fin de manche (en ms)
 const ANIMATION_DELAY = 300; // Le temps de revenir sur la page principale
@@ -25,6 +27,8 @@ export default class App extends Component {
       players: players,
       inGame: localStorage.getItem('inGame') === 'true' || Object.values(players).some(score => score !== 0),
       teams: this.loadTeams(),
+      history: this.loadHistory(), // Details de chaque manche, pour les succès
+      succes: false, // true quand on est sur la page des succès
       gains: this.loadGains(), // Points gagnés a la derniere manche ({nom: points})
       displayedPlayers: null, // Scores affichés pendant l'animation de fin de manche
       confettis: false,
@@ -42,6 +46,20 @@ export default class App extends Component {
         return saved;
     } catch (error) {
       // Sauvegarde illisible, on repart sans equipes
+    }
+    return [];
+  }
+
+  // Recupere les details des manches de la partie
+  loadHistory = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('history'));
+      const isRound = (round) => round !== null && typeof round === 'object' && Object.keys(round).length > 0
+        && Object.values(round).every(player => player !== null && Number.isFinite(player.points));
+      if (Array.isArray(saved) && saved.every(isRound))
+        return saved;
+    } catch (error) {
+      // Sauvegarde illisible, on repart sans historique
     }
     return [];
   }
@@ -89,6 +107,12 @@ export default class App extends Component {
   updateInGame = (inGame) => {
     this.setState({inGame: inGame});
     localStorage.setItem('inGame', inGame);
+  }
+
+  // Met a jour les details des manches
+  updateHistory = (history) => {
+    this.setState({history: history});
+    localStorage.setItem('history', JSON.stringify(history));
   }
 
   // Met a jour les equipes
@@ -150,7 +174,7 @@ export default class App extends Component {
   }
 
   // Ajoute les scores de la manche (scores: {nom: points})
-  add_scores = (scores, teams) => {
+  add_scores = (scores, teams, details) => {
     const updatedPlayers = { ...this.state.players };
     for (const name of Object.keys(scores)) {
       if (name in updatedPlayers)
@@ -160,6 +184,7 @@ export default class App extends Component {
     this.updatePlayer(updatedPlayers);
     this.updateGains(scores);
     this.updateTeams(teams);
+    this.updateHistory([...this.state.history, details]);
     this.setState({scoring: false, roundDone: true});
   }
 
@@ -234,9 +259,10 @@ export default class App extends Component {
       this.stopAnimation();
       this.updatePlayer(updatedPlayers);
       this.updateGains({});
+      this.updateHistory([]);
       this.updateTeams([]);
       this.updateInGame(false);
-      this.setState({scoring: false});
+      this.setState({scoring: false, succes: false});
     }, 200);
   }
 
@@ -247,11 +273,12 @@ export default class App extends Component {
 
   render() {
     const inGame = this.state.inGame;
-    const pageStyle = { transform: this.state.scoring ? "translateX(-100vw)" : "translateX(0vw)" };
+    const winners = this.getWinners(this.state);
+    const shown = (visible) => ({ transform: visible ? "translateX(-100vw)" : "translateX(0vw)" });
 
     return (
       <div className="App">
-        <div id="MainPage" style={pageStyle}>
+        <div id="MainPage" style={shown(this.state.scoring || this.state.succes)}>
           <span className='TitrePage'>1000 Bornes</span>
           {
             inGame ?
@@ -259,17 +286,21 @@ export default class App extends Component {
               : <AddPlayer add_player={this.add_player} />
           }
           <span className="ListeJoueurTitre">Liste des joueurs</span>
-          <PlayerList players={this.state.displayedPlayers || this.state.players} remove_player={this.remove_player} inGame={inGame} gains={this.state.gains} winners={this.getWinners(this.state)} />
+          <PlayerList players={this.state.displayedPlayers || this.state.players} remove_player={this.remove_player} inGame={inGame} gains={this.state.gains} winners={winners} />
           { !inGame && <DebutPartie start={this.start_game}/> }
           { inGame && !this.gameFinished() && <FinManche select_player={this.select_player}/> }
+          { winners.length > 0 && this.state.history.length > 0 && <VoirSucces show={() => this.setState({succes: true})}/> }
         </div>
         { this.state.confettis && <Confettis /> }
-        <div id="PlayerPage" style={pageStyle}>
+        <div id="PlayerPage" style={shown(this.state.scoring)}>
           {
             inGame &&
               <PlayerManager key={this.state.round} players={Object.keys(this.state.players)} teams={this.state.teams}
                 on_back={this.back_to_main} on_confirm={this.add_scores}/>
           }
+        </div>
+        <div id="SuccesPage" style={shown(this.state.succes)}>
+          <SuccesPage history={this.state.history} on_back={() => this.setState({succes: false})}/>
         </div>
       </div>
     );
